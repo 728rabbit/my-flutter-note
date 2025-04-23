@@ -87,3 +87,10 @@
 `(route) => true`
 
 不清舊頁
+
+
+問題： 有返回箭頭閃現
+
+動畫期間，舊頁還在堆疊中
+
+AppBar加 `automaticallyImplyLeading: false`
