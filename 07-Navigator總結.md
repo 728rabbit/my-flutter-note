@@ -46,3 +46,31 @@
 **有需要時才 pop**（不能pop就不動）
 
 `Navigator.maybePop(context);`
+
+
+
+# 🛠 小小心法
+
+場景
+
+推薦用法
+
+簡單跳頁
+
+`push` 或 `pushNamed`
+
+跳頁且不想回到上一頁
+
+`pushReplacement`
+
+跳頁且清空之前所有頁面
+
+`pushNamedAndRemoveUntil`
+
+返回上一頁
+
+`pop`
+
+返回到特定頁面
+
+`popUntil`
