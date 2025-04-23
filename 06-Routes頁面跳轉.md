@@ -160,3 +160,35 @@
 `arguments`
 
 可以傳 Map 資料到 Profile 頁面
+
+
+# ✨ 完整範例（整合 `routes` + `onGenerateRoute`）
+
+    import 'package:flutter/material.dart';
+    
+    // 集中路由管理
+    class AppRoutes {
+      static const String login = '/login';
+      static const String home = '/home';
+      static const String profile = '/profile';
+    
+      static final Map<String, WidgetBuilder> routes = {
+        login: (context) => const LoginScreen(),
+        home: (context) => const MyHomePage(title: 'Home'),
+      };
+    
+      static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+        switch (settings.name) {
+          case profile:
+            final args = settings.arguments as Map<String, dynamic>?;
+            final username = args?['username'] ?? 'Guest';
+            return MaterialPageRoute(
+              builder: (context) => ProfilePage(username: username),
+            );
+          default:
+            return MaterialPageRoute(
+              builder: (context) => const NotFoundPage(),
+            );
+        }
+      }
+    }
