@@ -1,73 +1,74 @@
 /*
 How to use:
 
-final LangService langService = LangService();
+final AppLang defaultLang = AppLang();
 
-class _PageState extends State<Page> {
-  @override
-  void initState() {
-    super.initState();
-    langService.addListener(_refresh);
-      
-  }
-
-  @override
-  void dispose() {
-    langService.removeListener(_refresh);
-    super.dispose();
-    
-  }
-
-  void _refresh() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-  
-  }
+@override
+void initState() {
+  super.initState();
+  defaultLang.addListener(_onLangChanged);
 }
 
-langService.setVal('zh')
+@override
+void dispose() {
+  defaultLang.removeListener(_onLangChanged);
+  super.dispose();
+}
 
-langService.getVal('welcome')
+void _onLangChanged() {
+  setState(() => {});
+}
+
+AppLang.setVal('zh')
+
+AppLang.getVal('welcome')
 */
 
 import 'package:flutter/material.dart';
 
-class AppLanguages {
+class SupportLangs {
   static const Map<String, Map<String, String>> translations = {
     'en': {
       'hello': 'Hello',
       'welcome': 'Welcome',
+      'btn_ok': 'OK',
+      'btn_yes': 'Yes',
+      'btn_no': 'No'
+
     },
-    'zh': {
-      'hello': '你好',
-      'welcome': '欢迎',
-    },
-    'yue': {
+    'zh-hant': {
       'hello': '你好呀',
       'welcome': '歡迎你',
+      'btn_ok': '確定',
+      'btn_yes': '是',
+      'btn_no': '否'
     }
   };
 }
 
-class LangService with ChangeNotifier {
+class AppLang with ChangeNotifier {
 
   // Singleton instance
-  static final LangService _instance = LangService._internal();
-  factory LangService() => _instance;
-  LangService._internal();
+  static final AppLang _instance = AppLang._internal();
+  factory AppLang() => _instance;
+  AppLang._internal();
 
   String _currentLang = 'en';
   String get currentLang => _currentLang;
 
+  String getCode() {
+    return _currentLang;
+  }
+
   void setVal(String lang) {
+    if (lang == _currentLang) return;
+    if (!SupportLangs.translations.containsKey(lang)) return;
     _currentLang = lang;
-    notifyListeners(); // Notify all listeners to refresh
+    // Notify all listeners to refresh
+    notifyListeners();
   }
 
   String getVal(String key) {
-    return AppLanguages.translations[_currentLang]?[key] ?? key;
+    return SupportLangs.translations[_currentLang]?[key] ?? key;
   }
 }

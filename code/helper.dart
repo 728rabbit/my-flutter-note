@@ -27,8 +27,8 @@ bool isValidEmail(String email) {
 }
 
 
-// Session
-Future<void> setSession(String name, Map<String, dynamic>? userData) async {
+// LocalData
+Future<void> setLocalData(String name, Map<String, dynamic>? userData) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (userData == null) {
     await prefs.remove(name);
@@ -39,7 +39,7 @@ Future<void> setSession(String name, Map<String, dynamic>? userData) async {
   }
 }
 
-Future<Map<String, dynamic>?> getSession(String name) async {
+Future<Map<String, dynamic>?> getLocalData(String name) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.get(name);
 
