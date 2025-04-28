@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:devapp/base.dart';
 import 'package:devapp/config.dart';
 import 'package:devapp/helper.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 /* Form submission example
@@ -14,6 +17,7 @@ import 'package:flutter/material.dart';
     'numberGe0': TextEditingController(),
     'numberGt0': TextEditingController(),
   };
+  List<File> selectedFiles = [];
 
   Form(
     key: _formKey,
@@ -28,14 +32,7 @@ import 'package:flutter/material.dart';
   ElevatedButton(
     onPressed: () {
       if (_formKey.currentState?.validate() ?? false) {
-          // Collect all form values
-          final formData = _controllers.map((key, controller) {
-            return MapEntry(key, controller.text);
-          });
-
-          formData['key_name'] = your_value;
-
-          print(formData);
+          doSubmit();
       }
     }
   )
@@ -48,6 +45,24 @@ import 'package:flutter/material.dart';
       ],
     ),
   )
+
+  Future<void> doSubmit() async {
+    // Collect all form values
+    final formData = _controllers.map((key, controller) {
+      return MapEntry(key, controller.text);
+    });
+
+    formData['key_name'] = your_value;
+
+    Map<String, File> formFiles = {};
+    if (selectedFiles.isNotEmpty) {
+      for (int i = 0; i < selectedFiles.length; i++) {
+        formFiles['file$i'] = selectedFiles[i]; // Change 'file$i' if needed
+      }
+    }
+
+    var response = await requestAPI(uploadUrl, body: body, files: formFiles);
+  }
 */
 
 // Label
@@ -272,7 +287,7 @@ class _InputBoxState extends BaseState<InputBox> {
                     : null,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 15)
           ]
         )
     );
@@ -441,6 +456,142 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.symmetric(horizontal: 0)
         ) 
+    );
+  }
+}
+
+/*
+Files Picker 
+
+List<File> selectedFiles = []; 
+
+FilesPicker(
+  onFilesSelected: (List<File> files) {
+    setState(() {
+      selectedFiles = files;
+    });
+  }, // Pass callback to child
+)
+
+Map<String, File> formFiles = {};
+if (selectedFiles.isNotEmpty) {
+  for (int i = 0; i < selectedFiles.length; i++) {
+    formFiles['file$i'] = selectedFiles[i]; // Change 'file$i' if needed
+  }
+}
+*/
+class FilesPicker extends StatefulWidget {
+  final String? buttonLabel; // Label for the button
+  final ValueChanged<List<File>>? onFilesSelected; // Callback to pass selected files to the parent
+
+  const FilesPicker({
+    super.key,
+    this.buttonLabel = 'Select File(s)',
+    this.onFilesSelected,
+  });
+
+  @override
+  State<FilesPicker> createState() => _FilesPickerState();
+}
+
+class _FilesPickerState extends State<FilesPicker> {
+  final List<File> _selectedFiles = [];
+  final List<String> _selectedFileNames = [];
+
+  void _pickFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        //_selectedFiles.clear();
+        //_selectedFileNames.clear();
+
+        for (var file in result.files) {
+          if (file.path != null) {
+            _selectedFiles.add(File(file.path!));
+            _selectedFileNames.add(file.name);
+          }
+        }
+      });
+
+      widget.onFilesSelected?.call(_selectedFiles);
+    }
+  }
+
+  void _deleteFile(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+      _selectedFileNames.removeAt(index);
+    });
+
+    widget.onFilesSelected?.call(_selectedFiles);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: 
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppConfig.hexCode('primary'),
+                foregroundColor: AppConfig.hexCode('white'),
+                minimumSize: Size(0, 48)
+              ),
+              onPressed: _pickFiles,
+              child: Text(widget.buttonLabel!),
+            ),
+            if (_selectedFiles.isNotEmpty)...[
+              Container(
+                margin: EdgeInsets.only(top: 15),
+                padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppConfig.hexCode('gray'), width: 2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _selectedFiles.length,
+                      separatorBuilder: (context, index) => Container(
+                        margin: EdgeInsets.symmetric(vertical: 4),
+                        child: Divider(
+                          color: AppConfig.hexCode('gray'),
+                          thickness: 1,
+                          height: 1,
+                          indent: 0,
+                          endIndent: 0
+                        ),
+                      ),
+                      itemBuilder: (context, i) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(_selectedFileNames[i], overflow: TextOverflow.ellipsis),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: AppConfig.hexCode('red')),
+                              onPressed: () => _deleteFile(i)
+                            ),
+                          ]
+                        );
+                      }
+                    )
+                  ]
+                )
+              )
+            ],
+            const SizedBox(height: 15)
+          ]
+        )
     );
   }
 }
