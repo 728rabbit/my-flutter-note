@@ -6,6 +6,9 @@ class YourPage extends StatefulWidget {
 
 class _YourPageState extends BaseState<YourPage> {
 
+   Widget build(BuildContext context) {
+
+   }
 }
 */
 
@@ -54,10 +57,10 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       SnackBar(
         content:Text(tipsMessage, 
           style: TextStyle(
-            color: AppConfig.colorCode('white')
+            color: AppConfig.hexCode('white')
           )
         ), 
-        backgroundColor: AppConfig.colorCode('primary'),
+        backgroundColor: AppConfig.hexCode('primary'),
       ),
     );
   }
@@ -81,8 +84,8 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
           actions:[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConfig.colorCode('primary'),
-                  foregroundColor: AppConfig.colorCode('white'),
+                  backgroundColor: AppConfig.hexCode('primary'),
+                  foregroundColor: AppConfig.hexCode('white'),
                   minimumSize: Size(double.infinity, 42),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(21)
@@ -126,8 +129,8 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
                     padding: EdgeInsets.only(right: 5),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppConfig.colorCode('primary'),
-                        foregroundColor: AppConfig.colorCode('white'),
+                        backgroundColor: AppConfig.hexCode('primary'),
+                        foregroundColor: AppConfig.hexCode('white'),
                         minimumSize: Size(double.infinity, 42),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(21),
@@ -148,8 +151,8 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
                     padding: EdgeInsets.only(left: 5),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppConfig.colorCode('primary'),
-                        foregroundColor: AppConfig.colorCode('white'),
+                        backgroundColor: AppConfig.hexCode('primary'),
+                        foregroundColor: AppConfig.hexCode('white'),
                         minimumSize: Size(double.infinity, 42),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(21),
@@ -176,7 +179,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
   void showContent(BuildContext context, String htmlData, {VoidCallback? closeCallback}) {
     showDialog(
       context: context,
-      //barrierDismissible: false, // 不允許點擊背景關閉對話框
+      //barrierDismissible: false, 
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -199,10 +202,10 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
                         },
                         style: {
                           "*": Style(
-                            color: AppConfig.colorCode('black')
+                            color: AppConfig.hexCode('black')
                           ),
                           "a": Style(
-                            color: AppConfig.colorCode('blue')
+                            color: AppConfig.hexCode('blue')
                         )}
                       )
                     ]
@@ -213,7 +216,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
                 right: 0,
                 top: 0,
                 child: IconButton(
-                  icon: Icon(Icons.close, color: AppConfig.colorCode('black')),
+                  icon: Icon(Icons.close, color: AppConfig.hexCode('black')),
                   onPressed: () {
                     Navigator.of(context).pop();
                     if (closeCallback != null) { closeCallback(); }

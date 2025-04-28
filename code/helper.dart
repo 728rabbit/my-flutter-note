@@ -4,28 +4,52 @@ import 'dart:io';
 import 'dart:convert';
 
 // Verification function
-bool isValidValue(String txt) {
-  return txt.trim().isEmpty;
-}
-
-bool isValidPassword(String password) {
-  if(isValidValue(password)) {
-    password = password.trim();
-    final pwdRegExp = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$');
-    return pwdRegExp.hasMatch(password);
+bool isValidValue(dynamic value) {
+  if(value != null) {
+    return value.toString().trim().isNotEmpty;
   }
   return false;
 }
 
-bool isValidEmail(String email) {
-  if(isValidValue(email)) {
-    email = email.trim();
+bool isValidEmail(dynamic value) {
+  if(isValidValue(value)) {
+    value = value.toString().trim();
     final emailRegExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegExp.hasMatch(email);
+    return emailRegExp.hasMatch(value);
   }
   return false;
 }
 
+bool isValidPassword(dynamic value) {
+  if(isValidValue(value)) {
+    value = value.toString().trim();
+    final pwdRegExp = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$');
+    return pwdRegExp.hasMatch(value);
+  }
+  return false;
+}
+
+bool isValidNumber(dynamic number, {bool digitalMode = false}) {
+  final reg = digitalMode 
+      ? RegExp(r'^[0-9]+$') 
+      : RegExp(r'(^((-)?[1-9]{1}\d{0,2}|0\.|0$))(((\d)+)?)(((\.)(\d+))?)$');
+  if (isValidValue(number)) {
+    number = number.toString().trim();
+    return reg.hasMatch(number);
+  }
+  return false;
+}
+
+bool isValueMatch(String value1, String value2, {bool sensitive = false}) {
+  if (isValidValue(value1) && isValidValue(value2)) {
+    final trimmedValue1 = value1.trim();
+    final trimmedValue2 = value2.trim();
+    return sensitive
+        ? trimmedValue1 == trimmedValue2
+        : trimmedValue1.toLowerCase() == trimmedValue2.toLowerCase();
+  }
+  return false;
+}
 
 // LocalData
 Future<void> setLocalData(String name, Map<String, dynamic>? userData) async {

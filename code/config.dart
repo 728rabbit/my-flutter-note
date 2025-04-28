@@ -9,7 +9,7 @@ class AppConfig {
     'primary': Color(0xFF8E4585),
     'darkgreen': Color(0xFF2489A2),
     'green': Color(0xFF9DD864),
-    'darkred': Color(0xFFD73D32),
+    'darkred': Color(0xFFB3261E),
     'red': Color(0xFFF93A37),
     'darkyellow': Color(0xFFFDA525),
     'yellow': Color(0xFFFFD700),
@@ -27,7 +27,7 @@ class AppConfig {
     'lightpink': Color(0xFFFFECEC)
   };
 
-  static Color colorCode(String name) {
+  static Color hexCode(String name) {
     return listColors[name] ?? Colors.black; // 找不到就給黑色
   }
 }
