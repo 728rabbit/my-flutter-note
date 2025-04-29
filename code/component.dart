@@ -566,7 +566,7 @@ FormField<String>(
 */
 class SelectBox extends StatefulWidget {
   final List<Map<String, dynamic>> items;
-  final int? defaultValue;
+  final dynamic defaultValue;
   final void Function(String?)? onChanged;
   final String? hintText;
   final String? errorText;
@@ -594,7 +594,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
     super.initState();
     if (widget.defaultValue != null) {
       _selectedItem = widget.items.firstWhere(
-        (item) => item['id'] == widget.defaultValue,
+        (item) => (item['id'].toString() == widget.defaultValue.toString()),
         orElse: () => {}
       );
       if (_selectedItem!.isEmpty) _selectedItem = null;
@@ -701,7 +701,7 @@ FilesPicker(
 Map<String, File> formFiles = {};
 if (selectedFiles.isNotEmpty) {
   for (int i = 0; i < selectedFiles.length; i++) {
-    formFiles['file$i'] = selectedFiles[i]; // Change 'file$i' if needed
+    formFiles['file_$i'] = selectedFiles[i];
   }
 }
 */

@@ -11,14 +11,12 @@ class _YourPageState extends BaseState<YourPage> {
    }
 }
 */
-
 import 'package:devapp/config.dart';
 import 'package:devapp/lang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom show Element;
 import 'package:url_launcher/url_launcher.dart';
-
 
 Map<String, dynamic>? authedUser;
 
@@ -228,5 +226,25 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
         );
       },
     );
+  }
+
+  void showBusy(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,  // Prevent dismiss by tapping outside
+      barrierColor: const Color.fromARGB(128, 255, 255, 255),  // Adjust overlay transparency
+      transitionDuration: Duration(milliseconds: 300),
+      pageBuilder: (BuildContext buildContext, Animation animation, Animation secondaryAnimation) {
+        return Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppConfig.hexCode('primary')),
+            strokeWidth: 5),
+        );
+      },
+    );
+  }
+
+  void hideBusy(BuildContext context) {
+    Navigator.of(context).pop();  // Close the dialog
   }
 }

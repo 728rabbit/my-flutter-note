@@ -147,28 +147,39 @@ Future<dynamic> requestAPI(
         });
       }
 
-      for (var entry in files.entries) {
-        var file = await http.MultipartFile.fromPath(entry.key, entry.value.path);
-        request.files.add(file);
+      // only works in native (mobile/desktop) environments
+      try {
+        for (var entry in files.entries) {
+          final fieldName = '${entry.key.replaceAll(RegExp(r'_\d+$'), '')}[]';
+          final file = await http.MultipartFile.fromPath(fieldName, entry.value.path);
+          request.files.add(file);
+        }
+      }
+      catch(e) {
+        print(e);
       }
 
       var streamedResponse = await request.send();
       result = await http.Response.fromStream(streamedResponse);
-    } else {
+    } 
+    else {
       dynamic requestBody;
       String contentType = headers['Content-Type'] ?? 'application/json';
 
       if (contentType.contains('application/json')) {
         requestBody = jsonEncode(body ?? {});
-      } else if (contentType.contains('application/x-www-form-urlencoded')) {
+      } 
+      else if (contentType.contains('application/x-www-form-urlencoded')) {
         if (body is Map && body.isNotEmpty) {
           requestBody = body.entries
               .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent('${e.value}')}')
               .join('&');
-        } else {
+        } 
+        else {
           requestBody = '';
         }
-      } else {
+      }
+      else {
         requestBody = body;
       }
 
