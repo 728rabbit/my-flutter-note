@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:devapp/base.dart';
 import 'package:devapp/config.dart';
 import 'package:devapp/helper.dart';
@@ -109,15 +108,17 @@ InputBox(
 class InputBox extends StatefulWidget {
   final String? outlineLabel;
   final String? inlineLabel;
-  final TextEditingController? controller;
-  final bool? isPassword;
   final String? hintTxt;
-  final String? errorText;
+  final TextEditingController? controller;
+
+  final bool? isPassword;
+  final bool? isDate;
+  final bool? isTime;
 
   final int? borderRadius;
   final int? maxLines;
   final TextStyle textStyle;
-  final TextInputType? keyboardType;
+
   final Icon? prefixIcon;
   final bool? readOnly;
   final bool? enabled;
@@ -128,14 +129,17 @@ class InputBox extends StatefulWidget {
     super.key,
     this.outlineLabel,
     this.inlineLabel,
-    this.isPassword,
-    this.controller,
     this.hintTxt,
-    this.errorText,
+    this.controller,
+
+    this.isPassword,
+    this.isDate,
+    this.isTime,
+  
     this.borderRadius,
     this.maxLines,
     this.textStyle = const TextStyle(),
-    this.keyboardType,
+
     this.prefixIcon,
     this.readOnly = false,
     this.enabled = true,
@@ -148,9 +152,9 @@ class InputBox extends StatefulWidget {
 }
 
 class _InputBoxState extends BaseState<InputBox> {
-  bool obscureText = true;
+  bool _obscureText = true;
 
-  String? validateInput(String? value) {
+  String? _validateInput(String? value) {
     if (widget.validationRule == null) return null;
 
     final rules = widget.validationRule!.split('|');
@@ -197,12 +201,53 @@ class _InputBoxState extends BaseState<InputBox> {
     return null;
   }
 
+  Future<void> _showDatePicker() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100)
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        widget.controller?.text = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Form.of(context).validate();
+      });
+    }
+  }
+
+  Future<void> _showTimePicker() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (picked != null) {
+      final now = DateTime.now();
+      final selectedDateTime = DateTime(
+        now.year, now.month, now.day, picked.hour, picked.minute,
+      );
+
+      setState(() {
+        widget.controller?.text = "${selectedDateTime.hour.toString().padLeft(2, '0')}:${selectedDateTime.minute.toString().padLeft(2, '0')}";
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Form.of(context).validate();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isPasswordField = widget.isPassword ?? false;
-    final double horizontalPadding = (widget.borderRadius != null
-        ? widget.borderRadius! / 2 + 12
-        : 12);
+    final bool isDateField = widget.isDate ?? false;
+    final bool isTimeField = widget.isTime ?? false;
+    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 12): 12);
 
     return SizedBox(
       width: double.infinity,
@@ -217,74 +262,97 @@ class _InputBoxState extends BaseState<InputBox> {
                 child: Text(
                   widget.outlineLabel!,
                   style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                )
               ),
               const SizedBox(height: 8),
             ],
             TextFormField(
               controller: widget.controller,
-              maxLines: isPasswordField ? 1 : (widget.maxLines ?? 1),
-              obscureText: isPasswordField ? obscureText : false,
+              maxLines: (isPasswordField ? 1 : (widget.maxLines ?? 1)),
+              obscureText: (isPasswordField ? _obscureText : false),
               style: widget.textStyle,
-              keyboardType: widget.keyboardType,
-              readOnly: widget.readOnly ?? false,
+              readOnly: ((isDateField || isTimeField) ? true : (widget.readOnly ?? false)),
               enabled: widget.enabled ?? true,
-              validator: validateInput,
+              validator: _validateInput,
+              onTap: (isDateField ? _showDatePicker : (isTimeField ? _showTimePicker : null)),
+              onChanged: (value) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Form.of(context).validate();
+                });
+              },
               decoration: InputDecoration(
-                prefixIcon: widget.prefixIcon,
-                labelText: (widget.inlineLabel?.isNotEmpty ?? false)
-                    ? widget.inlineLabel
-                    : null,
-                hintText: (widget.hintTxt?.isNotEmpty ?? false)
-                    ? widget.hintTxt
-                    : null,
-                errorText: widget.errorText,
+                labelText: ((widget.inlineLabel?.isNotEmpty ?? false) ? widget.inlineLabel : null),
+                hintText: ((widget.hintTxt?.isNotEmpty ?? false) ? widget.hintTxt: null),
+                
                 errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('red'))),
+                
                 filled: true,
                 fillColor: AppConfig.hexCode('white'),
                 hoverColor: Colors.transparent,
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: horizontalPadding,
-                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      (widget.borderRadius ?? 4).toDouble()),
+                  borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('gray'), width: 2),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      (widget.borderRadius ?? 4).toDouble()),
+                  borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color:AppConfig.hexCode('gray'), width: 2),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      (widget.borderRadius ?? 4).toDouble()),
+                  borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('gray'), width: 2),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      (widget.borderRadius ?? 4).toDouble()),
+                  borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('darkred'), width: 2),
                 ),
-                suffixIcon: isPasswordField
-                    ? IconButton(
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        icon: Icon(
-                          obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
+                prefixIcon: widget.prefixIcon,
+                suffixIcon: (
+                  isPasswordField ? 
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                      ),
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                    : 
+                    (isDateField ?
+                      (widget.controller!.text.isNotEmpty ? 
+                      IconButton(
+                        icon: Icon(Icons.clear),
                         onPressed: () {
-                          setState(() {
-                            obscureText = !obscureText;
+                          widget.controller?.clear();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Form.of(context).validate();
                           });
-                        },
+                        }
                       )
-                    : null,
+                      :
+                      Icon(Icons.calendar_today)) : (
+                      isTimeField ? 
+                      (
+                        widget.controller!.text.isNotEmpty ? 
+                        IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            widget.controller?.clear();
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              Form.of(context).validate();
+                            });
+                          }
+                        )
+                        :
+                        Icon(Icons.access_time)
+                      ): null))
+                  )
               ),
             ),
             const SizedBox(height: 15)
@@ -336,7 +404,7 @@ FormField<bool>(
 */
 class CheckBox extends StatefulWidget {
   final String? inlineLabel;
-  final bool? value; //The value of the radio button
+  final bool? value; //The value of the checkbox button
   final ValueChanged<bool?> onChanged; // The callback for value change
 
   const CheckBox({
@@ -357,7 +425,7 @@ class _CheckBoxState extends State<CheckBox> {
       width: double.infinity,
       child:
         CheckboxListTile(
-          title: Text(widget.inlineLabel ?? 'Default Label'),
+          title: Text(widget.inlineLabel ?? ''),
           value: widget.value,
           onChanged: widget.onChanged,
           activeColor: AppConfig.hexCode('primary'),
@@ -447,7 +515,7 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
       width: double.infinity,
       child:
         RadioListTile<T>(
-          title: Text(widget.inlineLabel ?? 'Default Label'),
+          title: Text(widget.inlineLabel ?? ''),
           value: widget.value,
           groupValue: widget.groupValue, 
           onChanged: widget.onChanged,
@@ -498,7 +566,7 @@ class _FilesPickerState extends State<FilesPicker> {
   final List<File> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
 
-  void _pickFiles() async {
+  void _showFilePicker() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
 
     if (result != null && result.files.isNotEmpty) {
@@ -542,7 +610,7 @@ class _FilesPickerState extends State<FilesPicker> {
                 foregroundColor: AppConfig.hexCode('white'),
                 minimumSize: Size(0, 48)
               ),
-              onPressed: _pickFiles,
+              onPressed: _showFilePicker,
               child: Text(widget.buttonLabel!),
             ),
             if (_selectedFiles.isNotEmpty)...[
