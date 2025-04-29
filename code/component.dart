@@ -365,7 +365,7 @@ class _InputBoxState extends BaseState<InputBox> {
 /* 
 CheckBox Options:
 
-bool? _agreeValue = false;
+bool? _checkboxValue = false;
 
 FormField<bool>(
   validator: (value) {
@@ -380,11 +380,12 @@ FormField<bool>(
       children: [
         CheckBox(
           inlineLabel: 'Keep me login',
-          value: _agreeValue ?? false,
+          value: _checkboxValue ?? false,
           onChanged: (value) {
             setState(() {
-              _agreeValue = value;
+              _checkboxValue = value;
               field.didChange(value);
+              field.validate();
             });
           },
         ),
@@ -440,11 +441,11 @@ class _CheckBoxState extends State<CheckBox> {
 /* 
 Raido Options:
 
-String? _selectedValue = 'A';
+String? _radioValue = 'A';
 
 FormField<String>(
   validator: (value) {
-    if (_selectedValue == null || _selectedValue.toString().isEmpty) {
+    if (_radioValue == null || _radioValue.toString().isEmpty) {
       return 'Please Select One Option';
     }
     return null;
@@ -456,11 +457,12 @@ FormField<String>(
         RadioBox<String>(
           inlineLabel: "Option A",
           value: "A",
-          groupValue: _selectedValue, // Bind to group value
+          groupValue: _radioValue, // Bind to group value
           onChanged: (value) {
             setState(() {
-              _selectedValue = value; // Update selected value when option changes
+              _radioValue = value; // Update selected value when option changes
               field.didChange(value);
+              field.validate();
             });
           },
         ),
@@ -468,11 +470,12 @@ FormField<String>(
         RadioBox<String>(
           inlineLabel: "Option B",
           value: "B",
-          groupValue: _selectedValue, // Bind to group value
+          groupValue: _radioValue, // Bind to group value
           onChanged: (value) {
             setState(() {
-              _selectedValue = value; // Update selected value when option changes
+              _radioValue = value; // Update selected value when option changes
               field.didChange(value);
+              field.validate();
             });
           },
         ), 
@@ -527,6 +530,160 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
     );
   }
 }
+
+/* Select Options:
+String? _selectedValue;
+
+FormField<String>(
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Please Select This Option';
+      }
+      return null;
+    },
+    builder: (field) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SelectBox(
+            items: [
+              {'id': 1, 'name': 'Apple'},
+              {'id': 2, 'name': 'Banana'},
+              {'id': 3, 'name': 'Cherry'},
+            ],
+            //defaultValue: 2,
+            errorText: field.errorText,
+            onChanged: (value) {
+              _selectedValue = value.toString();
+              field.didChange(value);
+              field.validate();
+            }
+          )
+        ]
+      );
+    }
+)
+*/
+class SelectBox extends StatefulWidget {
+  final List<Map<String, dynamic>> items;
+  final int? defaultValue;
+  final void Function(String?)? onChanged;
+  final String? hintText;
+  final String? errorText;
+  final int? borderRadius;
+
+  const SelectBox({
+    super.key,
+    required this.items,
+    this.defaultValue,
+    this.onChanged,
+    this.hintText = 'Please select',
+    this.errorText,
+    this.borderRadius,
+  });
+
+  @override
+  State<SelectBox>createState() => _SelectBoxState();
+}
+
+class _SelectBoxState extends BaseState<SelectBox> {
+  Map<String, dynamic>? _selectedItem;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.defaultValue != null) {
+      _selectedItem = widget.items.firstWhere(
+        (item) => item['id'] == widget.defaultValue,
+        orElse: () => {}
+      );
+      if (_selectedItem!.isEmpty) _selectedItem = null;
+    }
+  }
+
+  void _showSelectPicker() {
+    final List<Map<String, dynamic>> allItems = [
+      {'id': null, 'name': 'Please select'},
+      ...widget.items
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView(
+          children: allItems.map((item) {
+            final bool isSelected = item['id'] == _selectedItem?['id'];
+            return ListTile(
+              title: Text(item['name'], style: TextStyle(color: (isSelected ? AppConfig.hexCode('white') : AppConfig.hexCode('black')))),
+              trailing: isSelected ? Icon(Icons.check, color: AppConfig.hexCode('white')) : null,
+              selected: isSelected,
+              selectedTileColor: AppConfig.hexCode('primary'),
+              onTap: () {
+                setState(() {
+                  _selectedItem = item;
+                });
+                widget.onChanged?.call(item['id']?.toString());
+                
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 12): 12);
+
+    return InkWell(
+      onTap: _showSelectPicker,
+      child:
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppConfig.hexCode('white'),
+                border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('darkred') : AppConfig.hexCode('gray')), width: 2),
+                borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble())
+              ),
+              child: 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _selectedItem?['name'] ?? widget.hintText,
+                        style: TextStyle(
+                          fontSize: 16
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.arrow_drop_down)
+                  ]
+                )
+            ),
+            if (widget.errorText != null)...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, left: 12),
+                  child: Text(
+                    widget.errorText!,
+                    style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12),
+                  ),
+                )
+            ]
+          ],
+        ) 
+      );
+  }
+}
+
 
 /*
 Files Picker 
