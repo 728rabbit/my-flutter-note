@@ -7,61 +7,66 @@ import 'package:flutter/material.dart';
 
 /* Form submission example
 
-  final _formKey = GlobalKey<FormState>();
-  final Map<String, TextEditingController> _controllers = {
-    'username': TextEditingController(),
-    'password': TextEditingController(),
-    'email': TextEditingController(),
-    'number': TextEditingController(),
-    'numberGe0': TextEditingController(),
-    'numberGt0': TextEditingController(),
-  };
-  List<File> selectedFiles = [];
+final _formKey = GlobalKey<FormState>();
+final Map<String, TextEditingController> _controllers = {
+  'username': TextEditingController(),
+  'password': TextEditingController(),
+  'email': TextEditingController(),
+  'number': TextEditingController(),
+  'numberGe0': TextEditingController(),
+  'numberGt0': TextEditingController(),
+};
+List<File> selectedFiles = [];
 
-  Form(
-    key: _formKey,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InputBox()
-        ...
-      ]
-  )
+Form(
+  key: _formKey,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      InputBox()
+      ...
+    ]
+)
 
-  ElevatedButton(
-    onPressed: () {
-      if (_formKey.currentState?.validate() ?? false) {
-          doSubmit();
-      }
+ElevatedButton(
+  onPressed: () {
+    if (_formKey.currentState?.validate() ?? false) {
+        doSubmit();
     }
-  )
-
-  * SingleChildScrollView: This widget allows its child to scroll when the content exceeds the available space.
-  body: SingleChildScrollView(
-    child: Column(
-      children: [
-        // Your widgets here
-      ],
-    ),
-  )
-
-  Future<void> doSubmit() async {
-    // Collect all form values
-    final formData = _controllers.map((key, controller) {
-      return MapEntry(key, controller.text);
-    });
-
-    formData['key_name'] = your_value;
-
-    Map<String, File> formFiles = {};
-    if (selectedFiles.isNotEmpty) {
-      for (int i = 0; i < selectedFiles.length; i++) {
-        formFiles['file$i'] = selectedFiles[i]; // Change 'file$i' if needed
-      }
-    }
-
-    var response = await requestAPI(uploadUrl, body: body, files: formFiles);
   }
+)
+
+* SingleChildScrollView: This widget allows its child to scroll when the content exceeds the available space.
+body: SingleChildScrollView(
+  child: Column(
+    children: [
+      // Your widgets here
+    ],
+  ),
+)
+
+Future<void> doSubmit() async {
+  // Collect all form values
+  final formData = _controllers.map((key, controller) {
+    return MapEntry(key, controller.text);
+  });
+
+  formData['key_name'] = your_value;
+
+  Map<String, File> formFiles = {};
+  if (selectedFiles.isNotEmpty) {
+    for (int i = 0; i < selectedFiles.length; i++) {
+      formFiles['file_$i'] = selectedFiles[i]; // Change 'file$i' if needed
+    }
+  }
+
+  showBusy(context);
+  var response = await requestAPI(uploadUrl, body: body, files: formFiles);
+
+  // Use a stored function instead of context if possible
+  if (!mounted) return; // Ensure the widget is still in the widget tree
+  hideBusy(context);
+}
 */
 
 // Label
@@ -138,7 +143,7 @@ class InputBox extends StatefulWidget {
   
     this.borderRadius,
     this.maxLines,
-    this.textStyle = const TextStyle(),
+    this.textStyle = const TextStyle(fontSize: 14),
 
     this.prefixIcon,
     this.readOnly = false,
@@ -258,7 +263,7 @@ class _InputBoxState extends BaseState<InputBox> {
           children: [
             if (widget.outlineLabel != null)...[
               Padding(
-                padding: EdgeInsets.only(left: horizontalPadding),
+                padding: EdgeInsets.only(left: widget.borderRadius != null ? horizontalPadding : 0),
                 child: Text(
                   widget.outlineLabel!,
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -281,15 +286,17 @@ class _InputBoxState extends BaseState<InputBox> {
                 });
               },
               decoration: InputDecoration(
+                isDense: true,
                 labelText: ((widget.inlineLabel?.isNotEmpty ?? false) ? widget.inlineLabel : null),
                 hintText: ((widget.hintTxt?.isNotEmpty ?? false) ? widget.hintTxt: null),
                 
                 errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('red'))),
-                
+                errorMaxLines: 3,
+
                 filled: true,
                 fillColor: AppConfig.hexCode('white'),
                 hoverColor: Colors.transparent,
-                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
+                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('gray'), width: 2),
@@ -426,13 +433,14 @@ class _CheckBoxState extends State<CheckBox> {
       width: double.infinity,
       child:
         CheckboxListTile(
-          title: Text(widget.inlineLabel ?? ''),
+          dense: true,
+          title: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14)),
           value: widget.value,
           onChanged: widget.onChanged,
           activeColor: AppConfig.hexCode('primary'),
           hoverColor: Colors.transparent,
           controlAffinity: ListTileControlAffinity.leading,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 0)
+          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0)
         )
     );
   }
@@ -518,14 +526,15 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
       width: double.infinity,
       child:
         RadioListTile<T>(
-          title: Text(widget.inlineLabel ?? ''),
+          dense: true,
+          title: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14)),
           value: widget.value,
           groupValue: widget.groupValue, 
           onChanged: widget.onChanged,
           activeColor: AppConfig.hexCode('primary'),
           hoverColor: Colors.transparent,
           controlAffinity: ListTileControlAffinity.leading,
-          contentPadding: EdgeInsets.symmetric(horizontal: 0)
+          contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0)
         ) 
     );
   }
@@ -647,7 +656,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
-              height: 48,
+              height: 40,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
                 border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('darkred') : AppConfig.hexCode('gray')), width: 2),
@@ -655,13 +664,14 @@ class _SelectBoxState extends BaseState<SelectBox> {
               ),
               child: 
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
                         _selectedItem?['name'] ?? widget.hintText,
                         style: TextStyle(
-                          fontSize: 16
+                          fontSize: 14
                         ),
                       ),
                     ),
@@ -765,10 +775,14 @@ class _FilesPickerState extends State<FilesPicker> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConfig.hexCode('primary'),
                 foregroundColor: AppConfig.hexCode('white'),
-                minimumSize: Size(0, 48)
+                minimumSize: Size(0, 42),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)
+                )
               ),
               onPressed: _showFilePicker,
-              child: Text(widget.buttonLabel!),
+              child: Text(widget.buttonLabel!, style: TextStyle(fontSize: 14)),
             ),
             if (_selectedFiles.isNotEmpty)...[
               Container(

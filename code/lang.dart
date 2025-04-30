@@ -43,7 +43,6 @@ class SupportLangs {
       'time_error': 'Invalid time format.',
       'ge0_error': 'Value must be greater than or equal to 0.',
       'gt0_error': 'Value must be greater than 0.'
-
     },
     'zh-hant': {
       'hello': '你好呀',
