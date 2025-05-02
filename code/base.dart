@@ -238,7 +238,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
         return Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(AppConfig.hexCode('primary')),
-            strokeWidth: 5),
+            strokeWidth: 4)
         );
       },
     );
