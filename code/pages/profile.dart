@@ -1,4 +1,4 @@
-import 'package:devapp/common.dart';
+import 'package:devapp/layout.dart';
 import 'package:devapp/helper.dart';
 import 'package:flutter/material.dart';
 
@@ -45,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonLayout(
+    return AppLayout(
       currentIndex: 1, 
       child: FutureBuilder(
         future: Future.wait([userDataFuture, productDataFuture]),

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:devapp/base.dart';
-import 'package:devapp/common.dart';
+import 'package:devapp/layout.dart';
 import 'package:devapp/component.dart';
 import 'package:devapp/config.dart';
 import 'package:devapp/helper.dart';
@@ -92,7 +92,7 @@ class _HomePageState extends BaseState<HomePage> {
   
   @override
   Widget build(BuildContext context) {
-    return CommonLayout(
+    return AppLayout(
       currentIndex: 0, 
       child: SingleChildScrollView(
         padding: EdgeInsets.all(20),
