@@ -424,7 +424,7 @@ class _InputBoxState extends BaseState<InputBox> {
 /* 
 CheckBox Options:
 
-bool? _checkboxValue = false;
+bool _checkboxValue = false;
 
 FormField<bool>(
   validator: (value) {
