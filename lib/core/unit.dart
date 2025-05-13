@@ -428,7 +428,7 @@ bool? _checkboxValue = false;
 
 FormField<bool>(
   validator: (value) {
-    if (value != true) {
+    if (_checkboxValue != true) {
       return 'Please Select This Option';
     }
     return null;
@@ -501,11 +501,11 @@ class _CheckBoxState extends State<CheckBox> {
 /* 
 Raido Options:
 
-String? _radioValue = 'A';
+String _radioValue = 'A';
 
 FormField<String>(
   validator: (value) {
-    if (_radioValue == null || _radioValue.toString().isEmpty) {
+    if (_radioValue.isEmpty) {
       return 'Please Select One Option';
     }
     return null;
@@ -520,7 +520,7 @@ FormField<String>(
           groupValue: _radioValue, // Bind to group value
           onChanged: (value) {
             setState(() {
-              _radioValue = value; // Update selected value when option changes
+              _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
               field.didChange(value);
               field.validate();
             });
@@ -533,7 +533,7 @@ FormField<String>(
           groupValue: _radioValue, // Bind to group value
           onChanged: (value) {
             setState(() {
-              _radioValue = value; // Update selected value when option changes
+              _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
               field.didChange(value);
               field.validate();
             });
@@ -593,11 +593,11 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
 }
 
 /* Select Options:
-String? _selectedValue;
+String _selectedValue = '';
 
 FormField<String>(
     validator: (value) {
-      if (value == null || value.isEmpty) {
+      if (_selectedValue.isEmpty) {
         return 'Please Select This Option';
       }
       return null;
@@ -615,7 +615,7 @@ FormField<String>(
             //defaultValue: 2,
             errorText: field.errorText,
             onChanged: (value) {
-              _selectedValue = value.toString();
+              _selectedValue = ((value != null)?value.toString():'');
               field.didChange(value);
               field.validate();
             }

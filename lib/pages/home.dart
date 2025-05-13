@@ -55,12 +55,12 @@ class _HomePageState extends BaseState<HomePage> {
     'numberGt0': TextEditingController(),
   };
 
-  bool? _agreeValue = true; 
-  String? _selectedValue = 'A';
+  bool? _checkboxValue = true; 
+  String _radioValue = '';
+  String _selectedValue = '2';
 
-  List<File> selectedFiles = [];
+   List<File> selectedFiles = [];
   
-  String selectedboxValue = '2'; // Store selected files
 
   Future<void> doSubmit() async {
     // Collect all form values
@@ -164,7 +164,9 @@ class _HomePageState extends BaseState<HomePage> {
 
                   FormField<String>(
                     validator: (value) {
-                      if (selectedboxValue.isEmpty) {
+                      //_selectedValue = ((value != null)?value.toString():'');
+                      print(_selectedValue);
+                      if (_selectedValue.isEmpty) {
                         return 'Please Select This Option';
                       }
                       return null;
@@ -179,12 +181,12 @@ class _HomePageState extends BaseState<HomePage> {
                               {'id': 2, 'name': 'Banana'},
                               {'id': 3, 'name': 'Cherry'},
                             ],
-                            defaultValue: selectedboxValue.toString(),
+                            defaultValue: _selectedValue.toString(),
                             errorText: field.errorText,
                             onChanged: (value) {
+                              _selectedValue = ((value != null)?value.toString():'');
                               field.didChange(value);
                               field.validate();
-                              selectedboxValue = value.toString();
                             }
                           )
                         ]
@@ -194,7 +196,7 @@ class _HomePageState extends BaseState<HomePage> {
 
                   FormField<bool>(
                       validator: (value) {
-                        if (_agreeValue != true) {
+                        if (_checkboxValue != true) {
                           return 'Please Select This Option';
                         }
                         return null;
@@ -205,10 +207,10 @@ class _HomePageState extends BaseState<HomePage> {
                           children: [
                             CheckBox(
                               inlineLabel: 'Keep me login',
-                              value: _agreeValue ?? false,
+                              value: _checkboxValue ?? false,
                               onChanged: (value) {
                                 setState(() {
-                                  _agreeValue = value;
+                                  _checkboxValue = value;
                                   field.didChange(value);
                                   field.validate();
                                 });
@@ -231,7 +233,7 @@ class _HomePageState extends BaseState<HomePage> {
 
                   FormField<String>(
                     validator: (value) {
-                      if (_selectedValue == null || _selectedValue.toString().isEmpty) {
+                      if (_radioValue.isEmpty) {
                         return 'Please Select One Option';
                       }
                       return null;
@@ -243,10 +245,10 @@ class _HomePageState extends BaseState<HomePage> {
                           RadioBox<String>(
                             inlineLabel: "Option A",
                             value: "A",
-                            groupValue: _selectedValue, // Bind to group value
+                            groupValue: _radioValue, // Bind to group value
                             onChanged: (value) {
                               setState(() {
-                                _selectedValue = value; // Update selected value when option changes
+                                _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
                                 field.didChange(value);
                                 field.validate();
                               });
@@ -256,10 +258,10 @@ class _HomePageState extends BaseState<HomePage> {
                           RadioBox<String>(
                             inlineLabel: "Option B",
                             value: "B",
-                            groupValue: _selectedValue, // Bind to group value
+                            groupValue: _radioValue, // Bind to group value
                             onChanged: (value) {
                               setState(() {
-                                _selectedValue = value; // Update selected value when option changes
+                                _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
                                 field.didChange(value);
                                 field.validate();
                               });
