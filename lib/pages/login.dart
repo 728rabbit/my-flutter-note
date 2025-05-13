@@ -178,8 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                       }*/
                       else {
-                        Navigator.pushNamed(context, '/home');
-
                         // Check if the widget is still mounted before navigating
                         if (!mounted) return;
 
@@ -203,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           await setLocalData('authedUser', userData);
                           //Navigator.pushReplacementNamed(context, '/home');
 
-                            Navigator.pushNamed(context, '/home');
+                            Navigator.popAndPushNamed(context, '/home');
 
                         
 
