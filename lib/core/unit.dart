@@ -955,7 +955,7 @@ class _ImageSliderState extends State<ImageSlider> {
       _controller.animateToPage(
         nextPage,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        curve: Curves.easeInOut
       );
     });
   }
@@ -966,7 +966,7 @@ class _ImageSliderState extends State<ImageSlider> {
       _controller.animateToPage(
         nextPage,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        curve: Curves.easeInOut
       );
     }
   }
@@ -981,7 +981,7 @@ class _ImageSliderState extends State<ImageSlider> {
       ImageStreamListener((ImageInfo info, bool _) {
         final size = Size(
           info.image.width.toDouble(),
-          info.image.height.toDouble(),
+          info.image.height.toDouble()
         );
         completer.complete(size);
       }),
@@ -1023,9 +1023,11 @@ class _ImageSliderState extends State<ImageSlider> {
           }
           return child;
         } else {
-          return Center(child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppConfig.hexCode('primary')),
-            strokeWidth: 4)
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppConfig.hexCode('primary')),
+              strokeWidth: 4
+            )
           );
         }
       },
@@ -1069,7 +1071,7 @@ class _ImageSliderState extends State<ImageSlider> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 color: Colors.white,
-                onPressed: () => _onArrowPressed(-1),
+                onPressed: () => _onArrowPressed(-1)
               )
             ),
             Positioned(
@@ -1077,7 +1079,7 @@ class _ImageSliderState extends State<ImageSlider> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios),
                 color: Colors.white,
-                onPressed: () => _onArrowPressed(1),
+                onPressed: () => _onArrowPressed(1)
               )
             )
           ],
@@ -1095,7 +1097,7 @@ class _ImageSliderState extends State<ImageSlider> {
                       shape: BoxShape.circle,
                       color: _currentPage == index
                           ? AppConfig.hexCode('primary')
-                          : AppConfig.hexCode('gray'),
+                          : AppConfig.hexCode('gray')
                     )
                   );
                 })
