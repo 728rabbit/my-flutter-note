@@ -40,7 +40,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
   }
 
   // authedUserInfo('name')
-  dynamic authedUserInfo(key) {
+  dynamic authedUserInfo(String key) {
     if(key.isNotEmpty) {
       return (authedUser?[key] ?? '');
     }
