@@ -16,7 +16,10 @@ class AppLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My App")),
+      appBar: AppBar(
+        automaticallyImplyLeading: Navigator.canPop(context),  
+        title: const Text("My App")
+      ),
       body: child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,

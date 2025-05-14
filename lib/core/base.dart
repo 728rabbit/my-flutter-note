@@ -225,7 +225,6 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Html(
                         data: htmlData, 

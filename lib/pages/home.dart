@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:devapp/core/base.dart';
+import 'package:devapp/core/calendar.dart';
+import 'package:devapp/core/imageslider.dart';
 import 'package:devapp/core/lang.dart';
 import 'package:devapp/layout.dart';
 import 'package:devapp/core/unit.dart';
@@ -90,9 +92,73 @@ class _HomePageState extends BaseState<HomePage> {
     if (!mounted) return; // Ensure the widget is still in the widget tree
     hideBusy(context);
   }
+
+  Map<String, List<Map<String, String>>> _events = {};
+  DateTime _focusedMonth = DateTime.now();
+  DateTime _currentDate = DateTime.now();
+
+  Future<Map<String, List<Map<String, String>>>> fetchEvents(DateTime newMonth) async {
+    // Simulate delay
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Simulate the data returned from the API
+    if(newMonth.month.toInt() == 5) {
+      return {
+        '2025-05-14': [
+          {
+            'title': '看牙醫',
+            'description': '下午 3 點在尖沙咀診所',
+          }
+        ],
+        '2025-05-20': [
+          {
+            'title': '會議',
+            'description': '與客戶會議，Zoom ID: 123-456-789',
+          },
+          {
+            'title': '晚餐',
+            'description': '與朋友晚餐，在銅鑼灣某餐廳',
+          }
+        ]
+      };
+    }
+    else if(newMonth.month.toInt() == 6) {
+      return {
+        '2025-06-01': [
+          {
+            'title': '旅行',
+            'description': '去日本旅行，早上 8 點機',
+          }
+        ]
+      };
+    }
+    else {
+      return {};
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents(_focusedMonth);  // 載入資料
+  }
+
+  Future<void> _loadEvents(DateTime newMonth) async {
+    final data = await fetchEvents(newMonth);
+    setState(() {
+      _events = data;
+    });
+  }
+
   
+
   @override
   Widget build(BuildContext context) {
+    final dateKey = '${_currentDate.year.toString().padLeft(4, '0')}-'
+                '${_currentDate.month.toString().padLeft(2, '0')}-'
+                '${_currentDate.day.toString().padLeft(2, '0')}'; 
+    final todayEvents = _events[dateKey] ?? [];
+
     return AppLayout(
       currentIndex: 0, 
       child: SingleChildScrollView(
@@ -103,11 +169,11 @@ class _HomePageState extends BaseState<HomePage> {
             SizedBox(
               child: ImageSlider( 
                 imageUrls: [
-                  'https://picsum.photos/id/1015/400/200',
-                  'https://picsum.photos/id/1025/400/200',
-                  'https://picsum.photos/id/1035/400/200',
-                ]
-            )
+                    'https://picsum.photos/id/1015/400/200',
+                    'https://picsum.photos/id/1025/400/200',
+                    'https://picsum.photos/id/1035/400/200',
+                  ]
+              )
             )
             ,
 
@@ -116,7 +182,51 @@ class _HomePageState extends BaseState<HomePage> {
               onPressed: () => {},
             ),
 
-             Form(
+            CalendarWidget(
+              focusedMonth: _focusedMonth,
+              events: _events,
+              showLang: 'zh',
+              onMonthChanged: (newMonth) {
+                setState(() {
+                  _focusedMonth = newMonth;
+                });
+                _loadEvents(newMonth);
+              },
+              onDateSelected: (date) {
+                setState(() {
+                  _currentDate = date;
+                });
+              },
+            ),
+            ...[
+              const SizedBox(height: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '${_currentDate.year.toString().padLeft(4, '0')}年${_currentDate.month.toString().padLeft(2, '0')}月${_currentDate.day.toString().padLeft(2, '0')}日',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  if(todayEvents.isEmpty)...[
+                    const Text('No events today', style: TextStyle(color: Colors.grey))
+                  ],
+                  ...todayEvents.map((event) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(event['title'] ?? ''),
+                    subtitle: Text(event['description'] ?? ''),
+                    onTap: () {
+                      print(event);
+                    },
+                  )),
+                ],
+              )
+            ],
+
+
+
+            Form(
               key: _formKey,
               child: Column(
                 children: [
