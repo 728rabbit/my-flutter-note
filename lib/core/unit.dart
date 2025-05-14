@@ -88,8 +88,8 @@ class PrimaryBtn extends StatelessWidget {
     this.fontSize = 14,
     this.padding = const EdgeInsets.symmetric(horizontal: 20),
     this.width = double.infinity,
-    this.height = 42,
-    this.borderRadius = 0,
+    this.height = 46,
+    this.borderRadius = 2,
     this.backgroundColor,
     this.foregroundColor
   });
@@ -320,7 +320,7 @@ class _InputBoxState extends BaseState<InputBox> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 )
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
             ],
             TextFormField(
               controller: widget.controller,

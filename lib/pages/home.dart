@@ -161,9 +161,7 @@ class _HomePageState extends BaseState<HomePage> {
 
     return AppLayout(
       currentIndex: 0, 
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
+      childWidget: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -441,7 +439,6 @@ class _HomePageState extends BaseState<HomePage> {
             ),
           ]
         )
-      )
     );
   }
 }

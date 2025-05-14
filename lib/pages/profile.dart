@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return AppLayout(
       currentIndex: 1, 
-      child: FutureBuilder(
+      childWidget: FutureBuilder(
         future: Future.wait([userDataFuture, productDataFuture]),
         builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,9 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
           } else if (snapshot.hasData) {
             var userData = snapshot.data![0];
             var productData = snapshot.data![1];
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
+            return Column(
                 children: [
                   ListTile(
                     title: Text('User: ${userData['name']}'),
@@ -84,8 +82,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   )
                 ],
-              )
-            ) ;
+              );
+         
           } else {
             return Center(child: Text('No data available.'));
           }
