@@ -68,9 +68,10 @@ class AppLayout extends StatelessWidget {
               ): null)
             ),
             child:  
+              /* SingleChildScrollView: This widget allows its child to scroll when the content exceeds the available space. */
               SingleChildScrollView(
               padding: ((isFullWith == false)
-                  ? const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 40)
+                  ? const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 40)
                   : null),
               child: childWidget
             )

@@ -21,7 +21,7 @@ Map<String, dynamic>? authedUser;
 
 abstract class BaseState<T extends StatefulWidget> extends State<T> {
   final AppLang defaultLang = AppLang();
-
+  
   @override
   void initState() {
     super.initState();
@@ -50,6 +50,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
 
   // showTips(context, 'your_message_here')
   void showTips(BuildContext context, String tipsMessage) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(tipsMessage, 
@@ -69,6 +70,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       barrierDismissible: false, // Prevents dismissing by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
+          insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12)
           ),
@@ -107,6 +109,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       barrierDismissible: false, // Prevents dismissing by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
+          insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -179,6 +182,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       //barrierDismissible: false, 
       builder: (BuildContext context) {
         return Dialog(
+          insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -214,6 +218,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       //barrierDismissible: false, 
       builder: (BuildContext context) {
         return Dialog(
+          insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

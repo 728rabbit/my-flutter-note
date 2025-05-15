@@ -37,15 +37,6 @@ ElevatedButton(
   }
 )
 
-* SingleChildScrollView: This widget allows its child to scroll when the content exceeds the available space.
-body: SingleChildScrollView(
-  child: Column(
-    children: [
-      // Your widgets here
-    ],
-  ),
-)
-
 Future<void> doSubmit() async {
   // Collect all form values
   final formData = _controllers.map((key, controller) {
@@ -70,9 +61,10 @@ Future<void> doSubmit() async {
 }
 */
 // Button
-class PrimaryBtn extends StatelessWidget {
+class PrimaryBtn extends StatefulWidget {
   final String label;
-  final VoidCallback? onPressed;
+  final Future<void> Function()? onPressed;
+  final bool enableDelay;
   final double fontSize;
   final EdgeInsetsGeometry padding;
   final double width;
@@ -85,37 +77,87 @@ class PrimaryBtn extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.enableDelay = true,
     this.fontSize = 14,
     this.padding = const EdgeInsets.symmetric(horizontal: 20),
     this.width = double.infinity,
     this.height = 46,
     this.borderRadius = 2,
     this.backgroundColor,
-    this.foregroundColor
+    this.foregroundColor,
   });
 
   @override
+  State<PrimaryBtn> createState() => _PrimaryBtnState();
+}
+
+class _PrimaryBtnState extends State<PrimaryBtn> {
+  bool _isProcessing = false;
+
+  Future<void> _handleTap() async {
+    if (_isProcessing || widget.onPressed == null) return;
+    setState(() => _isProcessing = true);
+    try {
+      await widget.onPressed!();
+    } catch (e) {
+      debugPrint('PrimaryBtn error: $e');
+    } finally {
+      if(widget.enableDelay) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? AppConfig.hexCode('primary');
-    final fgColor = foregroundColor ?? AppConfig.hexCode('white');
+    final bgColor = widget.backgroundColor ?? AppConfig.hexCode('primary');
+    final fgColor = widget.foregroundColor ?? AppConfig.hexCode('white');
 
     return SizedBox(
-      width: width,
+      width: widget.width,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bgColor,
-          foregroundColor: fgColor,
-          minimumSize: Size(width, height),
-          padding: padding,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius)
-          )
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.disabled)) {
+                return bgColor.withValues(alpha: 100);
+              }
+              return bgColor;
+            },
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.disabled)) {
+                return fgColor.withValues(alpha: 100);
+              }
+              return fgColor;
+            },
+          ),
+          minimumSize: WidgetStateProperty.all(Size(widget.width, widget.height)),
+          padding: WidgetStateProperty.all(widget.padding),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
+          ),
         ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: TextStyle(fontSize: fontSize)
-        )
+        onPressed: _isProcessing ? null : _handleTap,
+        child: _isProcessing
+            ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(fgColor),
+                ),
+              )
+            : Text(
+                widget.label,
+                style: TextStyle(fontSize: widget.fontSize),
+              )
       )
     );
   }
@@ -123,12 +165,12 @@ class PrimaryBtn extends StatelessWidget {
 
 // Label
 class LableTxt extends StatelessWidget {
-  final String message;
+  final String txt;
   final TextStyle defaultStyle;
 
   const LableTxt({
     super.key,
-    required this.message,
+    required this.txt,
     this.defaultStyle = const TextStyle(
       fontWeight: FontWeight.normal
     )
@@ -138,7 +180,7 @@ class LableTxt extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: Text(message, style: defaultStyle)
+      child: Text(txt, style: defaultStyle)
     );
   }
 }
@@ -219,38 +261,38 @@ class _InputBoxState extends BaseState<InputBox> {
       switch (rule) {
         case 'required':
           if (!isValidValue(value)) {
-            return defaultLang.getVal('required_error');
+            return defaultLang.getVal('error_required');
           }
           break;
         case 'email':
           if (!isValidEmail(value)) {
-            return defaultLang.getVal('email_error');
+            return defaultLang.getVal('error_email_format');
           }
           break;
         case 'password':
           if (!isValidPassword(value)) {
-            return defaultLang.getVal('password_error');
+            return defaultLang.getVal('error_password_format');
           }
           break;
         case 'number':
           if (!isValidNumber(value)) {
-            return defaultLang.getVal('number_error');
+            return defaultLang.getVal('error_number_format');
           }
           break;
         case 'ge0':
           if (!isValidNumber(value)) {
-            return defaultLang.getVal('number_error');
+            return defaultLang.getVal('error_number_format');
           }
           else if (double.tryParse(value.toString().trim())! < 0) {
-            return defaultLang.getVal('ge0_error');
+            return defaultLang.getVal('error_ge0_format');
           }
           break;
         case 'gt0':
           if (!isValidNumber(value)) {
-            return defaultLang.getVal('number_error');
+            return defaultLang.getVal('error_number_format');
           } 
           else if(double.tryParse(value.toString().trim())! <= 0) {
-            return defaultLang.getVal('gt0_error');
+            return defaultLang.getVal('error_gt0_format');
           }
           break;
       }
@@ -341,7 +383,7 @@ class _InputBoxState extends BaseState<InputBox> {
                 labelText: ((widget.inlineLabel?.isNotEmpty ?? false) ? widget.inlineLabel : null),
                 hintText: ((widget.hintTxt?.isNotEmpty ?? false) ? widget.hintTxt: null),
                 
-                errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('red'))),
+                errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12, fontWeight: FontWeight.bold)),
                 errorMaxLines: 3,
 
                 filled: true,
@@ -362,7 +404,7 @@ class _InputBoxState extends BaseState<InputBox> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
-                  borderSide: BorderSide(color: AppConfig.hexCode('darkred'), width: 2)
+                  borderSide: BorderSide(color: AppConfig.hexCode('red'), width: 2)
                 ),
                 prefixIcon: widget.prefixIcon,
                 suffixIcon: (
@@ -413,7 +455,7 @@ class _InputBoxState extends BaseState<InputBox> {
                   )
               ),
             ),
-            const SizedBox(height: 15)
+            const SizedBox(height: 16)
           ]
         )
     );
@@ -660,7 +702,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
 
   void _showSelectPicker() {
     final List<Map<String, dynamic>> allItems = [
-      {'id': null, 'name': 'Please select'},
+      {'id': null, 'name': widget.hintText},
       ...widget.items
     ];
 
@@ -682,9 +724,9 @@ class _SelectBoxState extends BaseState<SelectBox> {
                 widget.onChanged?.call(item['id']?.toString());
                 
                 Navigator.pop(context);
-              },
+              }
             );
-          }).toList(),
+          }).toList()
         );
       },
     );
@@ -701,11 +743,11 @@ class _SelectBoxState extends BaseState<SelectBox> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
-              height: 40,
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
+              height: 39,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
-                border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('darkred') : AppConfig.hexCode('gray')), width: 2),
+                border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('red') : AppConfig.hexCode('gray')), width: 2),
                 borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble())
               ),
               child: 
@@ -729,7 +771,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
                   padding: const EdgeInsets.only(top: 6, left: 12),
                   child: Text(
                     widget.errorText!,
-                    style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12)
+                    style: TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12)
                   )
                 )
             ]
@@ -761,8 +803,8 @@ if (selectedFiles.isNotEmpty) {
 }
 */
 class FilesPicker extends StatefulWidget {
-  final String? buttonLabel; // Label for the button
-  final ValueChanged<List<File>>? onFilesSelected; // Callback to pass selected files to the parent
+  final String buttonLabel;
+  final ValueChanged<List<File>>? onFilesSelected;
 
   const FilesPicker({
     super.key,
@@ -819,18 +861,25 @@ class _FilesPickerState extends State<FilesPicker> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConfig.hexCode('primary'),
                 foregroundColor: AppConfig.hexCode('white'),
-                minimumSize: Size(0, 42),
+                minimumSize: Size(0, 46),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                 /*shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)
                 )*/
               ),
               onPressed: _showFilePicker,
-              child: Text(widget.buttonLabel!, style: TextStyle(fontSize: 14))
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add), // Plus icon
+                  SizedBox(width: 2),
+                  Text(widget.buttonLabel, style: TextStyle(fontSize: 14)),
+                ],
+              )
             ),
             if (_selectedFiles.isNotEmpty)...[
               Container(
-                margin: EdgeInsets.only(top: 15),
+                margin: EdgeInsets.only(top: 16),
                 padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 10),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppConfig.hexCode('gray'), width: 2),
@@ -861,7 +910,7 @@ class _FilesPickerState extends State<FilesPicker> {
                               child: Text(_selectedFileNames[i], overflow: TextOverflow.ellipsis),
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete, color: AppConfig.hexCode('red')),
+                              icon: Icon(Icons.close, size: 18, color: AppConfig.hexCode('darkred')),
                               onPressed: () => _deleteFile(i)
                             )
                           ]
@@ -872,7 +921,7 @@ class _FilesPickerState extends State<FilesPicker> {
                 )
               )
             ],
-            const SizedBox(height: 15)
+            const SizedBox(height: 16)
           ]
         )
     );

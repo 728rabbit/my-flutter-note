@@ -19,84 +19,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends BaseState<HomePage> {
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  final htmlcontent = """
-                      <h1>Term 1: Introduction</h1>
-                      <p>This is the introduction paragraph of the terms and conditions.</p>
-                      <h2>Term 2: Usage</h2>
-                      <p>You agree to use our service in accordance with these terms.</p>
-                      <h3>Term 3: Privacy</h3>
-                      <p>We respect your privacy and do not share your personal information.</p>
-                      <p><a href="https://hk.yahoo.com" target="_black">Click here for more information</a></p>
-                      """;
-  final leftWidget = Container(
-      color: Colors.red,
-      height: 200,
-      child: Center(child: Text('Left Content', style: TextStyle(color: Colors.white))),
-    );
-
-    final rightWidget = Container(
-      color: Colors.blue,
-      height: 200,
-      child: Center(child: Text('Right Content', style: TextStyle(color: Colors.white))),
-    );
+  Map<String, List<Map<String, String>>> _events = {};
+  DateTime _focusedMonth = DateTime.now();
+  DateTime _currentDate = DateTime.now();
 
   final _formKey = GlobalKey<FormState>();
   // TextEditingController 為每個輸入欄位
   final Map<String, TextEditingController> _controllers = {
     'username': TextEditingController(text: 'John Ma'),
     'password': TextEditingController(text: 'Abc123'),
-    'date': TextEditingController(text: '2025-04-11'),
+    'date': TextEditingController(text: '1992-04-11'),
     'time': TextEditingController(text: '17:15'),
     'email': TextEditingController(text: 'test@demo.com'),
-    'number': TextEditingController(text: '123'),
+    'address': TextEditingController(),
+    'telephone': TextEditingController(),
     'numberGe0': TextEditingController(),
     'numberGt0': TextEditingController(),
   };
 
+  String _selectedValue = '2';
   bool? _checkboxValue = true; 
   String _radioValue = '';
-  String _selectedValue = '2';
+  List<File> selectedFiles = [];
 
-   List<File> selectedFiles = [];
+  final htmlcontent = """
+    <h1>Term 1: Introduction</h1>
+    <p>This is the introduction paragraph of the terms and conditions.</p>
+    <h2>Term 2: Usage</h2>
+    <p>You agree to use our service in accordance with these terms.</p>
+    <h3>Term 3: Privacy</h3>
+    <p>We respect your privacy and do not share your personal information.</p>
+    <p><a href="https://hk.yahoo.com" target="_black">Click here for more information</a></p>
+    """;
   
-
-  Future<void> doSubmit() async {
-    // Collect all form values
-    final formData = _controllers.map((key, controller) {
-      return MapEntry(key, controller.text);
-    });
-
-    Map<String, File> formFiles = {};
-    if (selectedFiles.isNotEmpty) {
-      for (int i = 0; i < selectedFiles.length; i++) {
-        formFiles['file_$i'] = selectedFiles[i]; // Change 'file$i' if needed
-      }
-    }
-
-    showBusy(context);
-    var response = await requestAPI(
-      'http://localhost:8000/myprojects/mylib/testupload.php', 
-       body: formData, 
-       files: formFiles,
-       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }
-    );
-    print(response);
-
-    // Use a stored function instead of context if possible
-    if (!mounted) return; // Ensure the widget is still in the widget tree
-    hideBusy(context);
-  }
-
-  Map<String, List<Map<String, String>>> _events = {};
-  DateTime _focusedMonth = DateTime.now();
-  DateTime _currentDate = DateTime.now();
-
   Future<Map<String, List<Map<String, String>>>> fetchEvents(DateTime newMonth) async {
     // Simulate delay
     await Future.delayed(const Duration(seconds: 1));
@@ -137,6 +92,35 @@ class _HomePageState extends BaseState<HomePage> {
     }
   }
 
+  Future<void> doSubmit() async {
+    // Collect all form values
+    final formData = _controllers.map((key, controller) {
+      return MapEntry(key, controller.text);
+    });
+
+    Map<String, File> formFiles = {};
+    if (selectedFiles.isNotEmpty) {
+      for (int i = 0; i < selectedFiles.length; i++) {
+        formFiles['file_$i'] = selectedFiles[i]; // Change 'file$i' if needed
+      }
+    }
+
+    showBusy(context);
+    var response = await requestAPI(
+      'http://localhost:8000/myprojects/mylib/testupload.php', 
+      body: formData, 
+      files: formFiles,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
+    );
+    print(response);
+
+    // Use a stored function instead of context if possible
+    if (!mounted) return; // Ensure the widget is still in the widget tree
+    hideBusy(context);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -150,20 +134,66 @@ class _HomePageState extends BaseState<HomePage> {
     });
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     final dateKey = '${_currentDate.year.toString().padLeft(4, '0')}-'
                 '${_currentDate.month.toString().padLeft(2, '0')}-'
                 '${_currentDate.day.toString().padLeft(2, '0')}'; 
     final todayEvents = _events[dateKey] ?? [];
+    final currentSelectedLang = defaultLang.getCode();
 
     return AppLayout(
       currentIndex: 0, 
       childWidget: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            LableTxt(
+              txt: '${defaultLang.getVal('welcome')}, ${authedUserInfo('name')}',
+              defaultStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 20),
+            LableTxt(txt: '1. 轉換語言'),
+            const Divider(),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(
+                  child: 
+                    Padding(
+                      padding: EdgeInsets.only(right: 5), 
+                      child: 
+                        PrimaryBtn(
+                          label: 'Eng', 
+                          onPressed: () async {
+                            AppLang().setVal('en');
+                          }, 
+                          backgroundColor: (!isValueMatch(currentSelectedLang, 'en'))?AppConfig.hexCode('gray'):null,
+                          enableDelay: false
+                        )
+                      )
+                ),
+                Expanded(
+                  child: 
+                    Padding(
+                      padding: EdgeInsets.only(left: 5), 
+                      child: 
+                        PrimaryBtn(
+                          label: '繁體', 
+                          onPressed: () async {
+                            AppLang().setVal('zh-hant');
+                          }, 
+                          backgroundColor: (!isValueMatch(currentSelectedLang, 'zh-hant'))?AppConfig.hexCode('gray'):null,
+                          enableDelay: false
+                        )
+                      )
+                )
+              ],
+            ),
+
+            const SizedBox(height: 20),
+            LableTxt(txt: '2. 圖片輪播'),
+            const Divider(),
             SizedBox(
               child: ImageSlider( 
                 imageUrls: [
@@ -172,14 +202,11 @@ class _HomePageState extends BaseState<HomePage> {
                     'https://picsum.photos/id/1035/400/200',
                   ]
               )
-            )
-            ,
-
-            PrimaryBtn(
-              label: 'Delete',
-              onPressed: () => {},
             ),
 
+            const SizedBox(height: 20),
+            LableTxt(txt: '3. 事件日曆'),
+            const Divider(),
             CalendarWidget(
               focusedMonth: _focusedMonth,
               events: _events,
@@ -222,127 +249,32 @@ class _HomePageState extends BaseState<HomePage> {
               )
             ],
 
-
-
+            const SizedBox(height: 20),
+            LableTxt(txt: '4. 基本表格'),
+            const Divider(),
             Form(
               key: _formKey,
               child: Column(
                 children: [
                   InputBox(
-                    outlineLabel: 'Username',
+                    outlineLabel: defaultLang.getVal('user_id'),
                     controller: _controllers['username']!,
                     validationRule: 'required',
                   ),
+
                   InputBox(
-                    outlineLabel: 'Password',
+                    outlineLabel: defaultLang.getVal('password'),
                     isPassword: true,
                     controller: _controllers['password']!,
                     validationRule: 'required|password'
                   ),
 
-                  InputBox(
-                    outlineLabel: 'Birth Day',
-                    inlineLabel: 'Enter date',
-                    isDate: true,
-                    controller: _controllers['date']!,
-                    validationRule: 'required|date'
-                  ),
-
-                  InputBox(
-                    outlineLabel: 'Birth Time',
-                    inlineLabel: 'Enter time',
-                    isTime: true,
-                     controller: _controllers['time']!,
-                  ),
-
-
-                  InputBox(
-                    outlineLabel: 'Email',
-                    inlineLabel: 'Enter email',
-                    controller: _controllers['email']!,
-                    validationRule: 'required|email'
-                  ),
-
-                   InputBox(
-                    outlineLabel: 'Number',
-                    inlineLabel: 'Enter number',
-                    controller: _controllers['number']!,
-                    validationRule: 'required|number'
-                  ),
-
-                  FormField<String>(
-                    validator: (value) {
-                      //_selectedValue = ((value != null)?value.toString():'');
-                      print(_selectedValue);
-                      if (_selectedValue.isEmpty) {
-                        return 'Please Select This Option';
-                      }
-                      return null;
-                    },
-                    builder: (field) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SelectBox(
-                            items: [
-                              {'id': 1, 'name': 'Apple'},
-                              {'id': 2, 'name': 'Banana'},
-                              {'id': 3, 'name': 'Cherry'},
-                            ],
-                            defaultValue: _selectedValue.toString(),
-                            errorText: field.errorText,
-                            onChanged: (value) {
-                              _selectedValue = ((value != null)?value.toString():'');
-                              field.didChange(value);
-                              field.validate();
-                            }
-                          )
-                        ]
-                      );
-                    }
-                ),
-
-                  FormField<bool>(
-                      validator: (value) {
-                        if (_checkboxValue != true) {
-                          return 'Please Select This Option';
-                        }
-                        return null;
-                      },
-                      builder: (field) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CheckBox(
-                              inlineLabel: 'Keep me login',
-                              value: _checkboxValue ?? false,
-                              onChanged: (value) {
-                                setState(() {
-                                  _checkboxValue = value;
-                                  field.didChange(value);
-                                  field.validate();
-                                });
-                              },
-                            ),
-                            if (field.hasError)...[
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 6, left: 12),
-                                  child: Text(
-                                    field.errorText!,
-                                    style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12),
-                                  ),
-                                )
-                            ]
-                          ]
-                        );
-                      }
-                    ),
-
-
+                  LableTxt(txt: defaultLang.getVal('gender'), defaultStyle:TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
                   FormField<String>(
                     validator: (value) {
                       if (_radioValue.isEmpty) {
-                        return 'Please Select One Option';
+                        return defaultLang.getVal('error_select_option');
                       }
                       return null;
                     },
@@ -351,12 +283,12 @@ class _HomePageState extends BaseState<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RadioBox<String>(
-                            inlineLabel: "Option A",
-                            value: "A",
-                            groupValue: _radioValue, // Bind to group value
+                            inlineLabel: defaultLang.getVal('gender_male'),
+                            value: "M",
+                            groupValue: _radioValue,
                             onChanged: (value) {
                               setState(() {
-                                _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
+                                _radioValue = ((value != null)?value.toString():'');
                                 field.didChange(value);
                                 field.validate();
                               });
@@ -364,18 +296,17 @@ class _HomePageState extends BaseState<HomePage> {
                           ),
 
                           RadioBox<String>(
-                            inlineLabel: "Option B",
-                            value: "B",
-                            groupValue: _radioValue, // Bind to group value
+                            inlineLabel: defaultLang.getVal('gender_female'),
+                            value: "F",
+                            groupValue: _radioValue,
                             onChanged: (value) {
                               setState(() {
-                                _radioValue = ((value != null)?value.toString():''); // Update selected value when option changes
+                                _radioValue = ((value != null)?value.toString():'');
                                 field.didChange(value);
                                 field.validate();
                               });
                             },
-                          ), 
-
+                          ),
                           if (field.hasError)...[
                               Padding(
                                 padding: const EdgeInsets.only(top: 6, left: 12),
@@ -388,8 +319,77 @@ class _HomePageState extends BaseState<HomePage> {
                         ]
                       );
                   }),
-                
+                  const SizedBox(height: 16),
+
+                  InputBox(
+                    outlineLabel: defaultLang.getVal('birth_date'),
+                    hintTxt: 'e.g. 2000-02-12',
+                    isDate: true,
+                    controller: _controllers['date']!,
+                    validationRule: 'required|date'
+                  ),
+
+                  InputBox(
+                    outlineLabel: defaultLang.getVal('birth_time'),
+                    isTime: true,
+                     controller: _controllers['time']!,
+                  ),
+
+                  InputBox(
+                    outlineLabel: defaultLang.getVal('email'),
+                    controller: _controllers['email']!,
+                    validationRule: 'required|email'
+                  ),
+
+                  InputBox(
+                    outlineLabel: defaultLang.getVal('telephone'),
+                    controller: _controllers['telephone']!,
+                    validationRule: 'required|number'
+                  ),
+
+                  LableTxt(txt: defaultLang.getVal('district'), defaultStyle:TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  FormField<String>(
+                    validator: (value) {
+                      if (_selectedValue.isEmpty) {
+                        return defaultLang.getVal('error_select_option');
+                      }
+                      return null;
+                    },
+                    builder: (field) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SelectBox(
+                            items: [
+                              {'id': 1, 'name': defaultLang.getVal('district_1') },
+                              {'id': 2, 'name': defaultLang.getVal('district_2') },
+                              {'id': 3, 'name': defaultLang.getVal('district_3') },
+                            ],
+                            hintText: defaultLang.getVal('please_select'),
+                            defaultValue: _selectedValue.toString(),
+                            errorText: field.errorText,
+                            onChanged: (value) {
+                              _selectedValue = ((value != null)?value.toString():'');
+                              field.didChange(value);
+                              field.validate();
+                            }
+                          )
+                        ]
+                      );
+                    }
+                  ),
+                  const SizedBox(height: 16),
+
+                  InputBox(
+                    outlineLabel: defaultLang.getVal('address'),
+                    controller: _controllers['address']!,
+                    validationRule: 'required',
+                    maxLines: 3,
+                  ),
+
                   FilesPicker(
+                    buttonLabel: defaultLang.getVal('attachment'),
                     onFilesSelected: (List<File> files) {
                       setState(() {
                         selectedFiles = files;
@@ -397,43 +397,81 @@ class _HomePageState extends BaseState<HomePage> {
                     }, // Pass callback to child
                   ),
 
+                  FormField<bool>(
+                    validator: (value) {
+                      if (_checkboxValue != true) {
+                        return defaultLang.getVal('error_select_option');
+                      }
+                      return null;
+                    },
+                    builder: (field) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CheckBox(
+                            inlineLabel: defaultLang.getVal('agree_tnc'),
+                            value: _checkboxValue ?? false,
+                            onChanged: (value) {
+                              setState(() {
+                                _checkboxValue = value;
+                                field.didChange(value);
+                                field.validate();
+                              });
+                            },
+                          ),
+                          if (field.hasError)...[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6, left: 12),
+                                child: Text(
+                                  field.errorText!,
+                                  style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12),
+                                ),
+                              )
+                          ]
+                        ]
+                      );
+                    }
+                  ),
+                  const SizedBox(height: 16),
 
-                  ElevatedButton(
+                  PrimaryBtn(
+                    label: defaultLang.getVal('btn_submit'),
+                    borderRadius: 20,
                     onPressed: () async {
-                        
                       if (_formKey.currentState?.validate() ?? false) {
                         doSubmit();
-                        // Submit form if validation passes
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Form Submitted!')),
-                        );
                       }
-                    },
-                    child: const Text('Submit'),
+                      else {
+                        showTips(context, defaultLang.getVal('error_required_all'));
+                      }
+                    }
                   ),
 
-
+                  const SizedBox(height: 20),
+                  LableTxt(txt: '5. 其他'),
+                  const Divider(),
                   ElevatedButton(
                     onPressed: () {
-                        AppLang().setVal('en');
+                        showAlert(context, defaultLang.getVal('hello'));
                     },
-                    child: const Text('English'),
+                    child: const Text('Alert Message'),
                   ),
 
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                        AppLang().setVal('zh-hant');
+                        showConfirm(context, 'Are your sure delete this item?', yesCallback: () => {}, noCallback: () => {});
                     },
-                    child: const Text('繁體中文'),
+                    child: const Text('Confirm Dialog'),
                   ),
 
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                        showAlert(context, 'hello world');
-                      
+                        showHtmlContent(context, htmlcontent, closeCallback: () => {});
                     },
-                    child: const Text('show alert'),
-                  ),
+                    child: const Text('Html Content Dialog'),
+                  )
                 ],
               ),
             ),
