@@ -750,7 +750,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
-              height: 46,
+              height: 42,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
                 border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('red') : AppConfig.hexCode('gray')), width: 2),
