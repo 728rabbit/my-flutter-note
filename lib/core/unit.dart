@@ -383,7 +383,7 @@ class _InputBoxState extends BaseState<InputBox> {
                 labelText: ((widget.inlineLabel?.isNotEmpty ?? false) ? widget.inlineLabel : null),
                 hintText: ((widget.hintTxt?.isNotEmpty ?? false) ? widget.hintTxt: null),
                 
-                errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12, fontWeight: FontWeight.bold)),
+                errorStyle: ((widget.showErrorTips == false)?TextStyle(fontSize: 0, height: 0): TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12, )),
                 errorMaxLines: 3,
 
                 filled: true,

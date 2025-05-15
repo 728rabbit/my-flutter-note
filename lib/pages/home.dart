@@ -312,7 +312,7 @@ class _HomePageState extends BaseState<HomePage> {
                                 padding: const EdgeInsets.only(top: 6, left: 12),
                                 child: Text(
                                   field.errorText!,
-                                  style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12),
+                                  style: TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12),
                                 ),
                               )
                           ]
@@ -424,7 +424,7 @@ class _HomePageState extends BaseState<HomePage> {
                                 padding: const EdgeInsets.only(top: 6, left: 12),
                                 child: Text(
                                   field.errorText!,
-                                  style: TextStyle(color: AppConfig.hexCode('red'), fontSize: 12),
+                                  style: TextStyle(color: AppConfig.hexCode('darkred'), fontSize: 12),
                                 ),
                               )
                           ]
