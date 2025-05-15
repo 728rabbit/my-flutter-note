@@ -526,7 +526,10 @@ class _CheckBoxState extends State<CheckBox> {
       child:
         CheckboxListTile(
           dense: true,
-          title: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14)),
+          title: Transform.translate(
+            offset: Offset(-8, 0),
+            child: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14))
+          ),
           value: widget.value,
           onChanged: widget.onChanged,
           activeColor: AppConfig.hexCode('primary'),
@@ -618,7 +621,10 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
       child:
         RadioListTile<T>(
           dense: true,
-          title: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14)),
+          title: Transform.translate(
+            offset: Offset(-8, 0),
+            child: Text(widget.inlineLabel ?? '', style: TextStyle(fontSize: 14))
+          ),
           value: widget.value,
           groupValue: widget.groupValue, 
           onChanged: widget.onChanged,
@@ -744,7 +750,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
-              height: 39,
+              height: 46,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
                 border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('red') : AppConfig.hexCode('gray')), width: 2),
