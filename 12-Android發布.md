@@ -1,6 +1,19 @@
 
 Flutter 應用在 Android 平台上發布
 ---
+your_flutter_project/
+├── android/
+│   ├── app/
+│   │   ├── build.gradle       ← App 模組設定檔 (簽名設定寫這裡)
+│   │   ├── your-release-key.jks  ← 你的 keystore 檔案 (自己放進去)
+│   │   └── src/
+│   │       └── ...
+│   ├── key.properties          ← 存放簽名密碼的設定檔 (需自己新增)
+│   ├── build.gradle            ← Android 項目設定
+│   └── ...
+├── lib/
+│   └── main.dart
+└── ...
 
 ### 1. 準備環境
 
@@ -92,3 +105,7 @@ Flutter 應用在 Android 平台上發布
 -   填寫應用資料與隱私政策等
     
 -   發布應用
+├── lib/
+│   └── main.dart
+└── ...
+
