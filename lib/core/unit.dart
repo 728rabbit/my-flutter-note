@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:devapp/core/base.dart';
-import 'package:devapp/core/config.dart';
-import 'package:devapp/core/helper.dart';
+import 'package:base_app/core/base.dart';
+import 'package:base_app/core/config.dart';
+import 'package:base_app/core/helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 

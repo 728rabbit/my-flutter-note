@@ -1,5 +1,5 @@
-import 'package:devapp/layout.dart';
-import 'package:devapp/core/helper.dart';
+import 'package:base_app/layout.dart';
+import 'package:base_app/core/helper.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -73,13 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       setLocalData('authedUser', null);
                       Navigator.pushReplacementNamed(context, '/login');
                     }, child: const Text('登出')),
-                  ),
-                  SizedBox(
-                    child: 
-                    ElevatedButton(
-                      onPressed: () => {},
-                      child: Text('Show Alert'),
-                    )
                   )
                 ],
               );

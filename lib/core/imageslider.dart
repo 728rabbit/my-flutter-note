@@ -11,7 +11,7 @@ ImageSlider(
 */
 import 'dart:async';
 
-import 'package:devapp/core/config.dart';
+import 'package:base_app/core/config.dart';
 import 'package:flutter/material.dart';
 
 class ImageSlider extends StatefulWidget {

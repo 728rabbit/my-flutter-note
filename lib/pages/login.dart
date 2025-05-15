@@ -1,7 +1,7 @@
-import 'package:devapp/core/base.dart';
-import 'package:devapp/core/helper.dart';
-import 'package:devapp/core/unit.dart';
-import 'package:devapp/layout.dart';
+import 'package:base_app/core/base.dart';
+import 'package:base_app/core/helper.dart';
+import 'package:base_app/core/unit.dart';
+import 'package:base_app/layout.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {

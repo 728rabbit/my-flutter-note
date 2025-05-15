@@ -1,17 +1,25 @@
 import 'dart:io';
-import 'package:devapp/core/base.dart';
-import 'package:devapp/core/helper.dart';
-import 'package:devapp/pages/home.dart';
-import 'package:devapp/pages/login.dart';
-import 'package:devapp/routes.dart';
+import 'package:base_app/core/base.dart';
+import 'package:base_app/core/helper.dart';
+import 'package:base_app/pages/home.dart';
+import 'package:base_app/pages/login.dart';
+import 'package:base_app/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   authedUser = await getLocalData('authedUser');
 
   initPushNotifincation();
-  runApp(MyApp()); 
+
+  // Lock the screen to portrait
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  runApp(MyApp());
 }
 
 void initPushNotifincation() {

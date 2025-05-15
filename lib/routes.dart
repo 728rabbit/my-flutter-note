@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:devapp/pages/home.dart';
-import 'package:devapp/pages/login.dart';
-import 'package:devapp/pages/profile.dart';
+import 'package:base_app/pages/home.dart';
+import 'package:base_app/pages/login.dart';
+import 'package:base_app/pages/profile.dart';
 
 class AppRoute {
   static const String login = '/login';

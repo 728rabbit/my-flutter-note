@@ -10,8 +10,8 @@ class _YourPageState extends BaseState<YourPage> {
    }
 }
 */
-import 'package:devapp/core/config.dart';
-import 'package:devapp/core/lang.dart';
+import 'package:base_app/core/config.dart';
+import 'package:base_app/core/lang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom show Element;
@@ -70,6 +70,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       barrierDismissible: false, // Prevents dismissing by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12)
@@ -109,6 +110,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       barrierDismissible: false, // Prevents dismissing by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -182,6 +184,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       //barrierDismissible: false, 
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -218,6 +221,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       //barrierDismissible: false, 
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           insetPadding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
