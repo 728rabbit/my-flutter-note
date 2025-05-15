@@ -55,31 +55,34 @@ your_flutter_project/
     
 -   修改  `android/app/build.gradle`  中的 signingConfigs 節點
 ---
-    def keystoreProperties = new Properties()
-        def keystorePropertiesFile = rootProject.file('key.properties')
-        if (keystorePropertiesFile.exists()) {
-            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    import java.util.Properties
+    import java.io.FileInputStream
+
+    val keystoreProperties = Properties()
+    val keystorePropertiesFile = rootProject.file("key.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    }
+    
+    android {
+        ...
+        signingConfigs {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
         }
-        
-        android {
-            ...
-            signingConfigs {
-                release {
-                    keyAlias keystoreProperties['keyAlias']
-                    keyPassword keystoreProperties['keyPassword']
-                    storeFile file(keystoreProperties['storeFile'])
-                    storePassword keystoreProperties['storePassword']
-                }
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+                minifyEnabled false
+                shrinkResources false
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             }
-            buildTypes {
-                release {
-                    signingConfig signingConfigs.release
-                    minifyEnabled false
-                    shrinkResources false
-                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                }
-            }
-        }` 
+        }
+    }
     
 
 ### 5. 編譯發布版 APK 或 AAB
