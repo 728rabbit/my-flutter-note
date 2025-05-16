@@ -81,7 +81,7 @@ class PrimaryBtn extends StatefulWidget {
     this.fontSize = 14,
     this.padding = const EdgeInsets.symmetric(horizontal: 20),
     this.width = double.infinity,
-    this.height = 46,
+    this.height = 48,
     this.borderRadius = 2,
     this.backgroundColor,
     this.foregroundColor,
@@ -373,7 +373,7 @@ class _InputBoxState extends BaseState<InputBox> {
                 filled: true,
                 fillColor: AppConfig.hexCode('white'),
                 hoverColor: Colors.transparent,
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+                contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: horizontalPadding),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('gray'), width: 2)
@@ -734,7 +734,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
-              height: 46,
+              height: 48,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
                 border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('red') : AppConfig.hexCode('gray')), width: 2),
@@ -851,7 +851,7 @@ class _FilesPickerState extends State<FilesPicker> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConfig.hexCode('primary'),
                 foregroundColor: AppConfig.hexCode('white'),
-                minimumSize: Size(0, 46),
+                minimumSize: Size(0, 48),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                 /*shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)
