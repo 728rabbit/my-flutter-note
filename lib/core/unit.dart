@@ -330,7 +330,7 @@ class _InputBoxState extends BaseState<InputBox> {
     final bool isPasswordField = widget.isPassword ?? false;
     final bool isDateField = widget.isDate ?? false;
     final bool isTimeField = widget.isTime ?? false;
-    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 12): 12);
+    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 8): 12);
 
     return SizedBox(
       width: double.infinity,
@@ -373,7 +373,7 @@ class _InputBoxState extends BaseState<InputBox> {
                 filled: true,
                 fillColor: AppConfig.hexCode('white'),
                 hoverColor: Colors.transparent,
-                contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: horizontalPadding),
+                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular((widget.borderRadius ?? 4).toDouble()),
                   borderSide: BorderSide(color: AppConfig.hexCode('gray'), width: 2)
@@ -437,7 +437,7 @@ class _InputBoxState extends BaseState<InputBox> {
                         Icon(Icons.access_time)
                       ): null))
                   )
-              ),
+              )
             ),
             const SizedBox(height: 16)
           ]
@@ -654,6 +654,7 @@ FormField<String>(
 )
 */
 class SelectBox extends StatefulWidget {
+  final String? outlineLabel;
   final List<Map<String, dynamic>> items;
   final dynamic defaultValue;
   final void Function(String?)? onChanged;
@@ -663,6 +664,7 @@ class SelectBox extends StatefulWidget {
 
   const SelectBox({
     super.key,
+    this.outlineLabel,
     required this.items,
     this.defaultValue,
     this.onChanged,
@@ -724,7 +726,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
 
   @override
   Widget build(BuildContext context) {
-    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 12): 12);
+    final double horizontalPadding = (widget.borderRadius != null ? (widget.borderRadius! / 2 + 8): 12);
 
     return InkWell(
       onTap: _showSelectPicker,
@@ -732,8 +734,18 @@ class _SelectBoxState extends BaseState<SelectBox> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.outlineLabel != null)...[
+              Padding(
+                padding: EdgeInsets.only(left: widget.borderRadius != null ? horizontalPadding : 0),
+                child: Text(
+                  widget.outlineLabel!,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              ),
+              const SizedBox(height: 4),
+            ],
             Container(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12),
               height: 48,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),

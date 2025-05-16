@@ -54,12 +54,14 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                     outlineLabel: defaultLang.getVal('user_id'),
                     controller: _controllers['username']!,
                     validationRule: 'required',
+                    borderRadius: 24
                   ),
                   InputBox(
                     outlineLabel: defaultLang.getVal('password'),
                     isPassword: true,
                     controller: _controllers['password']!,
-                    validationRule: 'required'
+                    validationRule: 'required',
+                    borderRadius: 24
                   ),
                   const SizedBox(height: 10),
                   PrimaryBtn(

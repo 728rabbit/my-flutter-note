@@ -374,8 +374,7 @@ class _HomePageState extends BaseState<HomePage> {
                     validationRule: 'required|number'
                   ),
 
-                  LableTxt(txt: defaultLang.getVal('district'), defaultStyle:TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
+  
                   FormField<String>(
                     validator: (value) {
                       if (_selectedValue.isEmpty) {
@@ -388,6 +387,7 @@ class _HomePageState extends BaseState<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SelectBox(
+                            outlineLabel: defaultLang.getVal('district'),
                             items: [
                               {'id': 1, 'name': defaultLang.getVal('district_1') },
                               {'id': 2, 'name': defaultLang.getVal('district_2') },
@@ -412,7 +412,7 @@ class _HomePageState extends BaseState<HomePage> {
                     outlineLabel: defaultLang.getVal('address'),
                     controller: _controllers['address']!,
                     validationRule: 'required',
-                    maxLines: 3,
+                    maxLines: 5,
                   ),
 
                   FilesPicker(
