@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:base_app/core/base.dart';
 import 'package:base_app/core/calendar.dart';
+import 'package:base_app/core/flexgrid.dart';
 import 'package:base_app/core/imageslider.dart';
 import 'package:base_app/core/lang.dart';
 import 'package:base_app/layout.dart';
@@ -195,22 +196,48 @@ class _HomePageState extends BaseState<HomePage> {
             LableTxt(txt: '2. 圖片輪播'),
             const Divider(),
             SizedBox(
-              child: ImageSlider( 
-                imageUrls: [
-                    'https://picsum.photos/id/1015/400/200',
-                    'https://picsum.photos/id/1025/400/200',
-                    'https://picsum.photos/id/1035/400/200',
-                  ]
+              child: ImageSlider(
+                images: [
+                  AssetImage('assets/images/sample-1.jpg'),
+                  AssetImage('assets/images/sample-2.jpg'),
+                  AssetImage('assets/images/sample-3.jpg'),
+                  AssetImage('assets/images/sample-4.jpg')
+                ],
               )
             ),
 
+            const SizedBox(height: 20),
+            LableTxt(txt: '2. 水平滾動'),
+            const Divider(),
+            HorizontalScroller(
+              spacing: 10,
+              items: [
+                SizedBox(
+                  width: (screenWidth(context) * 0.75),
+                  child: Image.asset('assets/images/sample-1.jpg', fit: BoxFit.fitWidth),
+                ),
+                SizedBox(
+                  width: (screenWidth(context) * 0.75),
+                  child: Image.asset('assets/images/sample-2.jpg', fit: BoxFit.fitWidth),
+                ),
+                SizedBox(
+                  width: (screenWidth(context) * 0.75),
+                  child: Image.asset('assets/images/sample-3.jpg', fit: BoxFit.fitWidth),
+                ),
+                SizedBox(
+                  width: (screenWidth(context) * 0.75),
+                  child: Image.asset('assets/images/sample-4.jpg', fit: BoxFit.fitWidth),
+                )
+              ]
+            ),
+  
             const SizedBox(height: 20),
             LableTxt(txt: '3. 事件日曆'),
             const Divider(),
             CalendarWidget(
               focusedMonth: _focusedMonth,
               events: _events,
-              showLang: 'zh',
+              showLang: (isValueMatch(currentSelectedLang, 'en')?'en':'zh'),
               onMonthChanged: (newMonth) {
                 setState(() {
                   _focusedMonth = newMonth;
@@ -448,7 +475,23 @@ class _HomePageState extends BaseState<HomePage> {
                   ),
 
                   const SizedBox(height: 20),
-                  LableTxt(txt: '5. 其他'),
+                  LableTxt(txt: '5. 響應式 GridView'),
+                  const Divider(),
+                  FlexGrid(
+                    minDisplayCount: 2,
+                    maxDisplayCount: 4, 
+                    items: 
+                      List.generate(
+                        10,
+                        (index) => Container(
+                          color: Colors.blue[100 * ((index % 8) + 1)],
+                          child: Center(child: Text("Item $index")),
+                        ),
+                      )
+                  ),
+
+                  const SizedBox(height: 20),
+                  LableTxt(txt: '6. 其他'),
                   const Divider(),
                   ElevatedButton(
                     onPressed: () {

@@ -38,6 +38,14 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
     setState(() => {});
   }
 
+  int screenWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width.toInt();
+  }
+
+  int screenHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height.toInt();
+  }
+
   // authedUserInfo('name')
   dynamic authedUserInfo(String? key) {
     if(key != null) {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 // Verification function
 bool isValidValue(dynamic value) {
   if(value != null) {

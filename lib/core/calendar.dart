@@ -151,11 +151,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         ? ['日', '一', '二', '三', '四', '五', '六']
         : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    double initHeight = (MediaQuery.of(context).size.width.toInt() > 680)? 60: 40;
+
     return Column(
       children: [
         Container(
           color: Colors.blue,
-          height: 48,
+          height: (initHeight + 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -189,7 +191,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               children: weekLabels
                   .map(
                     (label) => Container(
-                      height: 40,
+                      height: initHeight,
                       alignment: Alignment.center,
                       color: Colors.blue.shade50,
                       child: Text(
@@ -203,7 +205,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ..._buildCalendarRows(
               startOffset: weekdayOffset,
               daysInMonth: daysInMonth,
-              today: today
+              today: today,
+              initHeight: initHeight,
             )
           ]
         )
@@ -215,6 +218,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     required int startOffset,
     required int daysInMonth,
     required DateTime today,
+    required double initHeight
   }) {
     List<TableRow> rows = [];
     List<Widget> cells = [];
@@ -223,7 +227,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     while (dayCounter <= daysInMonth) {
       for (int i = 0; i < 7; i++) {
         if (dayCounter < 1 || dayCounter > daysInMonth) {
-          cells.add(Container(height: 40));
+          cells.add(Container(height: initHeight));
         } else {
           final date = DateTime(widget.focusedMonth.year, widget.focusedMonth.month, dayCounter);
           final key = _formatDateKey(date);
@@ -241,7 +245,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 widget.onDateSelected?.call(date);
               },
               child: Container(
-                height: 40,
+                height: initHeight,
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.blue.shade50

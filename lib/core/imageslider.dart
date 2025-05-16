@@ -1,12 +1,12 @@
 /*
 Slider gallery
 
-ImageSlider( 
-    imageUrls: [
-      'https://picsum.photos/id/1015/400/200',
-      'https://picsum.photos/id/1025/400/200',
-      'https://picsum.photos/id/1035/400/200',
-    ]
+ImageSlider(
+  images: [
+    NetworkImage('https://www.w3schools.com/html/pic_trulli.jpg'),
+    AssetImage('assets/images/sample-1.jpg'),
+    AssetImage('assets/images/sample-2.jpg'),
+  ]
 )
 */
 import 'dart:async';
@@ -15,7 +15,7 @@ import 'package:base_app/core/config.dart';
 import 'package:flutter/material.dart';
 
 class ImageSlider extends StatefulWidget {
-  final List<String> imageUrls;
+  final List<ImageProvider> images;
   final bool autoPlay;
   final Duration interval;
   final bool arrowController;
@@ -24,7 +24,7 @@ class ImageSlider extends StatefulWidget {
 
   const ImageSlider({
     super.key,
-    required this.imageUrls,
+    required this.images,
     this.autoPlay = true,
     this.interval = const Duration(seconds: 3),
     this.arrowController = true,
@@ -43,6 +43,69 @@ class _ImageSliderState extends State<ImageSlider> {
   double _currentHeight = 0; // default initial height
   final Map<int, double> _imageHeights = {}; // store image heights per index
 
+  Future<void> _loadInitialImageSize() async {
+    if (widget.images.isNotEmpty) {
+      _updateImageHeight(_currentPage, widget.images[_currentPage]);
+    }
+  }
+
+  void _startAutoPlay() {
+    _timer = Timer.periodic(widget.interval, (_) {
+      if (!_controller.hasClients) return;
+      int nextPage = (_currentPage + 1) % widget.images.length;
+      _controller.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut
+      );
+    });
+  }
+
+  void _onArrowPressed(int direction) {
+    int nextPage = _currentPage + direction;
+    if (nextPage >= 0 && nextPage < widget.images.length && _controller.hasClients) {
+      _controller.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut
+      );
+    }
+  }
+
+  Future<void> _updateImageHeight(int index, ImageProvider provider) async {
+    if (!mounted) return;
+
+    final completer = Completer<Size>();
+    final imageStream = provider.resolve(const ImageConfiguration());
+
+    final listener = ImageStreamListener((ImageInfo info, bool _) {
+      final size = Size(
+        info.image.width.toDouble(),
+        info.image.height.toDouble(),
+      );
+      completer.complete(size);
+    });
+
+    imageStream.addListener(listener);
+
+    final size = await completer.future;
+    final aspectRatio = size.width / size.height;
+
+    if (mounted) {
+      final width = MediaQuery.of(context).size.width;
+      final newHeight = width / aspectRatio;
+
+      setState(() {
+        _imageHeights[index] = newHeight;
+        if (_currentPage == index) {
+          _currentHeight = newHeight;
+        }
+      });
+    }
+
+    imageStream.removeListener(listener);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,68 +118,6 @@ class _ImageSliderState extends State<ImageSlider> {
     });
   }
 
-  Future<void> _loadInitialImageSize() async {
-    if (widget.imageUrls.isNotEmpty) {
-      _updateImageHeight(_currentPage, widget.imageUrls[_currentPage]);
-    }
-  }
-
-  void _startAutoPlay() {
-    _timer = Timer.periodic(widget.interval, (_) {
-      if (!_controller.hasClients) return;
-      int nextPage = (_currentPage + 1) % widget.imageUrls.length;
-      _controller.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut
-      );
-    });
-  }
-
-  void _onArrowPressed(int direction) {
-    int nextPage = _currentPage + direction;
-    if (nextPage >= 0 && nextPage < widget.imageUrls.length && _controller.hasClients) {
-      _controller.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut
-      );
-    }
-  }
-
-  Future<void> _updateImageHeight(int index, String url) async {
-    // Ensure the widget is still mounted before proceeding.
-    if (!mounted) return;
-
-    final completer = Completer<Size>();
-    final image = Image.network(url);
-    image.image.resolve(const ImageConfiguration()).addListener(
-      ImageStreamListener((ImageInfo info, bool _) {
-        final size = Size(
-          info.image.width.toDouble(),
-          info.image.height.toDouble()
-        );
-        completer.complete(size);
-      }),
-    );
-
-    final size = await completer.future;
-    final aspectRatio = size.width / size.height;
-
-    // Use context safely inside mounted check
-    if (mounted) {
-      final width = MediaQuery.of(context).size.width;
-      final newHeight = width / aspectRatio;
-
-      setState(() {
-        _imageHeights[index] = newHeight;
-        if (_currentPage == index) {
-          _currentHeight = newHeight;
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -124,29 +125,29 @@ class _ImageSliderState extends State<ImageSlider> {
     super.dispose();
   }
 
-  Widget _buildImage(String url, int index) {
-    return Image.network(
-      url,
+  Widget _buildImage(ImageProvider imageProvider, int index) {
+    return Image(
+      image: imageProvider,
       fit: BoxFit.cover,
       width: double.infinity,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           if (!_imageHeights.containsKey(index)) {
-            _updateImageHeight(index, url);
+            _updateImageHeight(index, imageProvider);
           }
           return child;
         } else {
           return Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(AppConfig.hexCode('primary')),
-              strokeWidth: 4
-            )
+              strokeWidth: 4,
+            ),
           );
         }
       },
       errorBuilder: (context, error, stackTrace) {
         return const Center(child: Icon(Icons.error));
-      }
+      },
     );
   }
 
@@ -163,19 +164,19 @@ class _ImageSliderState extends State<ImageSlider> {
         children: [
           PageView.builder(
             controller: _controller,
-            itemCount: widget.imageUrls.length,
+            itemCount: widget.images.length,
             onPageChanged: (index) {
               setState(() {
                 _currentPage = index;
                 if (_imageHeights.containsKey(index)) {
                   _currentHeight = _imageHeights[index]!;
                 } else {
-                  _updateImageHeight(index, widget.imageUrls[index]);
+                  _updateImageHeight(index, widget.images[index]);
                 }
               });
             },
             itemBuilder: (context, index) {
-              return _buildImage(widget.imageUrls[index], index);
+              return _buildImage(widget.images[index], index);
             }
           ),
           if (widget.arrowController == true) ...[
@@ -201,7 +202,7 @@ class _ImageSliderState extends State<ImageSlider> {
               bottom: 10,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(widget.imageUrls.length, (index) {
+                children: List.generate(widget.images.length, (index) {
                   return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: _currentPage == index ? 12 : 8,

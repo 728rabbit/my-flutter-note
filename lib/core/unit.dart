@@ -119,32 +119,16 @@ class _PrimaryBtnState extends State<PrimaryBtn> {
     return SizedBox(
       width: widget.width,
       child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (states.contains(WidgetState.disabled)) {
-                return bgColor.withValues(alpha: 100);
-              }
-              return bgColor;
-            },
-          ),
-          foregroundColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (states.contains(WidgetState.disabled)) {
-                return fgColor.withValues(alpha: 100);
-              }
-              return fgColor;
-            },
-          ),
-          minimumSize: WidgetStateProperty.all(Size(widget.width, widget.height)),
-          padding: WidgetStateProperty.all(widget.padding),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(widget.borderRadius),
-            ),
-          ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bgColor,
+          foregroundColor: fgColor,
+          minimumSize: Size(0, widget.height),
+          padding: widget.padding,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius)
+          )
         ),
-        onPressed: _isProcessing ? null : _handleTap,
+        onPressed: _isProcessing ? (() => {}) : _handleTap,
         child: _isProcessing
             ? SizedBox(
                 width: 18,
@@ -750,7 +734,7 @@ class _SelectBoxState extends BaseState<SelectBox> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 4),
-              height: 42,
+              height: 46,
               decoration: BoxDecoration(
                 color: AppConfig.hexCode('white'),
                 border: Border.all(color: (widget.errorText != null ? AppConfig.hexCode('red') : AppConfig.hexCode('gray')), width: 2),
@@ -931,5 +915,46 @@ class _FilesPickerState extends State<FilesPicker> {
           ]
         )
     );
+  }
+}
+
+/*
+HorizontalScroller(
+  spacing: 10,
+  items: []
+)  
+*/
+class HorizontalScroller extends StatelessWidget {
+  final List<Widget> items;
+  final double spacing;
+
+  const HorizontalScroller({
+    super.key,
+    required this.items,
+    this.spacing = 10,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: _addSpacing(items, spacing)
+        )
+      )
+    );
+  }
+
+  List<Widget> _addSpacing(List<Widget> items, double spacing) {
+    final spaced = <Widget>[];
+    for (int i = 0; i < items.length; i++) {
+      spaced.add(items[i]);
+      if (i != items.length - 1) {
+        spaced.add(SizedBox(width: spacing));
+      }
+    }
+    return spaced;
   }
 }
